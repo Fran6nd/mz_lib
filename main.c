@@ -110,7 +110,7 @@ void draw_map()
     {
         pos.x = COLS - 1;
     }
-    move(pos.x, pos.y);
+    move(pos.y, pos.x);
     addch('O');
 }
 int is_on_map(struct position p)
@@ -174,7 +174,7 @@ struct neighbor get_advanced_neighboors(struct position p)
     right.x = p.x + 1;
     left.y = p.y;
     left.x = p.x - 1;
-    struct position up_right = {p.x+1,p.y-1}, down_right = {p.x +1,p.y+1},down_left = {p.x-1,p.y+1} , up_left = {p.x-1,p.y-1};
+    struct position up_right = {p.x + 1, p.y - 1}, down_right = {p.x + 1, p.y + 1}, down_left = {p.x - 1, p.y + 1}, up_left = {p.x - 1, p.y - 1};
 
     struct neighbor nb;
     nb.n = 0;
@@ -227,21 +227,37 @@ int is_pathable(struct position p)
     {
         if (get_tile(p.x, p.y) == '+')
         {
-            struct neighbor nb = get_advanced_neighboors(p);
-            if (nb.n == 4)
+            struct neighbor nb1 = get_neighboors(p);
+            if (nb1.n == 4)
             {
                 int i;
                 int j = 0;
-                for (i = 0; i < nb.n; i++)
+                for (i = 0; i < nb1.n; i++)
                 {
-                    if (get_tile(nb.paths[i].x, nb.paths[i].y) == ' ')
+                    if (get_tile(nb1.paths[i].x, nb1.paths[i].y) == ' ')
                     {
                         j++;
                     }
                 }
-                if (j == 1)
+                if (j <= 1)
                 {
-                    return 1;
+                    struct neighbor nb = get_advanced_neighboors(p);
+                    if (nb.n == 8)
+                    {
+                        i = 0;
+                        j = 0;
+                        for (i = 0; i < nb.n; i++)
+                        {
+                            if (get_tile(nb.paths[i].x, nb.paths[i].y) == ' ')
+                            {
+                                j++;
+                            }
+                        }
+                        if (j <= 3)
+                        {
+                            return 1;
+                        }
+                    }
                 }
             }
         }
@@ -308,24 +324,26 @@ void randomize_neighbor(struct neighbor *nb)
 }
 void _generate(struct position point)
 {
-    set_msg("Started!");
-    set_tile(point.x, point.y, ' ');
-    struct neighbor nb = get_pathables(point);
-    //randomize_neighbor(&nb);
-    draw_map();
-    refresh();
-    usleep(3000);
-
-    int i;
-    if (nb.n)
+    if (is_pathable(point))
     {
-        for (i = 0; i < nb.n; i++)
-        {
+        set_msg("Started!");
+        set_tile(point.x, point.y, ' ');
+        struct neighbor nb = get_pathables(point);
+        //randomize_neighbor(&nb);
+        draw_map();
+        refresh();
+        usleep(3000);
 
-            _generate(nb.paths[i]);
+        int i;
+        if (nb.n)
+        {
+            for (i = 0; i < nb.n; i++)
+            {
+
+                _generate(nb.paths[i]);
+            }
         }
     }
-
 }
 void generate()
 {
