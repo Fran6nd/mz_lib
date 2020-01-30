@@ -139,7 +139,7 @@ void draw_map()
     {
         printw("MazeCurses by fran6nd\n");
     }
-    move(LINES-1, COLS - 20);
+    move(LINES - 1, COLS - 20);
     if (has_colors)
     {
         attron(COLOR_PAIR(5));
@@ -369,7 +369,8 @@ void _generate(struct position point)
         struct neighbor nb = get_pathables(point);
         draw_map();
         refresh();
-        usleep(3000);
+        /* Want it faster? Remove the following line :) */
+        usleep(1000);
 
         int i;
         if (nb.n)
@@ -443,7 +444,6 @@ begin:
     end_point = find_random_path();
     generating = 0;
 
-
     while (running)
     {
         prev_pos.x = pos.x;
@@ -454,7 +454,7 @@ begin:
         char c = getch();
 
         if (c == '\033')
-        { 
+        {
             getch();
             switch (getch())
             {
@@ -472,7 +472,8 @@ begin:
                 break;
             }
         }
-        else if (c == 'q'){
+        else if (c == 'q')
+        {
             goto quit;
         }
         if (get_tile(pos.x, pos.y) != ' ')
@@ -487,7 +488,7 @@ begin:
     }
     running = 1;
     goto begin;
-    quit:
+quit:
     free(map);
     endwin();
 
