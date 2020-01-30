@@ -110,7 +110,9 @@ int is_on_map(struct position p)
 
 void set_tile(int _x, int _y, char _c)
 {
-    map[_y * COLS + _x] = _c;
+    struct position p = {_x, _y};
+    //if(is_on_map(p))
+        map[_y * COLS + _x] = _c;
 }
 struct neighbor get_neighboors(struct position p)
 {
@@ -119,10 +121,10 @@ struct neighbor get_neighboors(struct position p)
     up.y = p.y - 1;
     down.x = p.x;
     down.y = p.y + 1;
-    right.y = right.y;
-    right.x = right.x + 1;
+    right.y = p.y;
+    right.x = p.x + 1;
     left.y = p.y;
-    left.x = left.x - 1;
+    left.x = p.x - 1;
     struct neighbor nb;
     nb.n = 0;
     if (is_on_map(up))
@@ -145,6 +147,7 @@ struct neighbor get_neighboors(struct position p)
         nb.paths[nb.n] = left;
         nb.n++;
     }
+    return nb;
 }
 int is_pathable(struct position p)
 {
@@ -174,10 +177,10 @@ struct neighbor get_pathables(struct position p)
     up.y = p.y - 1;
     down.x = p.x;
     down.y = p.y + 1;
-    right.y = right.y;
-    right.x = right.x + 1;
+    right.y = p.y;
+    right.x = p.x + 1;
     left.y = p.y;
-    left.x = left.x - 1;
+    left.x = p.x - 1;
     struct neighbor nb;
     nb.n = 0;
     if (is_pathable(up) && can_move_h(&p))
@@ -200,19 +203,21 @@ struct neighbor get_pathables(struct position p)
         nb.paths[nb.n] = left;
         nb.n++;
     }
+    return nb;
 }
 void _generate(struct position point)
 {
-    set_tile(point.x, point.y, ' ');
+    //set_tile(point.x, point.y, ' ');
     struct neighbor nb = get_pathables(point);
     int i;
     for (i = 0; i < nb.n; i++)
     {
+      
         _generate(nb.paths[i]);
     }
     if (nb.n < 0)
     {
-        set_tile(2, 2, '*');
+        //set_tile(2, 2, '*');
         running = 0;
         error = nb.n;
     }
@@ -220,7 +225,7 @@ void _generate(struct position point)
 void generate()
 {
     struct position prev_point = {0, 0};
-    struct position point = {15, 15};
+    struct position point = {0, 0};
     _generate(point);
 }
 
