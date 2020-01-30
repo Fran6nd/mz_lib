@@ -494,6 +494,9 @@ begin:
                 break;
             }
         }
+        else if (c == 'q'){
+            goto quit;
+        }
         if (get_tile(pos.x, pos.y) != ' ')
         {
             pos.x = prev_pos.x;
@@ -506,6 +509,7 @@ begin:
     }
     running = 1;
     goto begin;
+    quit:
     free(map);
     endwin();
 
