@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc main.c -lncurses  -o Maze
+gcc main.c -lncurses  -o MazeCurses

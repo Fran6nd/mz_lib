@@ -436,6 +436,7 @@ int main(void)
 
     map = malloc(((LINES * COLS)) * sizeof(char));
 begin:
+    generating = 1;
     memset(map, '+', LINES * COLS);
     generate();
     pos = find_random_path();
