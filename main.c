@@ -9,17 +9,9 @@ int running = 1;
 int error = 0;
 int generating = 1;
 
-char msg[100];
-
 int random_between(int min, int max)
 {
     return rand() % ((max + 1) - min) + min;
-}
-
-void set_msg(char *s)
-{
-    memset(msg, 0, 100);
-    memcpy(msg, s, strlen(s));
 }
 
 struct position
@@ -70,25 +62,24 @@ int can_move_h(struct position *p)
 
 void draw_map()
 {
-    //clear();
     int _x = 0;
     int _y = 0;
     for (_y = 0; _y < LINES; _y++)
     {
         for (_x = 0; _x < COLS; _x++)
         {
-            //mvprintw(_y, _x, get_tile(_x, _y));
             move(_y, _x);
             if (has_colors && get_tile(_x, _y) == '+')
             {
-                //attron(COLOR_PAIR(3));
-                addch(' ');
-                //attroff(COLOR_PAIR(3));
-            }
-            else if (has_colors && get_tile(_x, _y) == ' '){
                 attron(COLOR_PAIR(4));
                 addch(' ');
                 attroff(COLOR_PAIR(4));
+            }
+            else if (has_colors && get_tile(_x, _y) == ' ')
+            {
+                attron(COLOR_PAIR(3));
+                addch(' ');
+                attroff(COLOR_PAIR(3));
             }
             else
             {
@@ -136,6 +127,28 @@ void draw_map()
         {
             addch('O');
         }
+    }
+    move(0, 5);
+    if (has_colors)
+    {
+        attron(COLOR_PAIR(5));
+        printw("MazeCurses by fran6nd\n");
+        attroff(COLOR_PAIR(5));
+    }
+    else
+    {
+        printw("MazeCurses by fran6nd\n");
+    }
+    move(LINES-1, COLS - 20);
+    if (has_colors)
+    {
+        attron(COLOR_PAIR(5));
+        printw("Press [q] to exit.\n");
+        attroff(COLOR_PAIR(5));
+    }
+    else
+    {
+        printw("Press [q] to exit.\n");
     }
 }
 int is_on_map(struct position p)
@@ -371,7 +384,6 @@ void _generate(struct position point)
 {
     if (is_pathable(point))
     {
-        set_msg("Started!");
         set_tile(point.x, point.y, ' ');
         struct neighbor nb = get_pathables(point);
         //randomize_neighbor(&nb);
@@ -416,8 +428,8 @@ struct position find_random_path()
 void generate()
 {
     struct position point;
-    point.x = random_between(0, COLS/2 - 1) * 2;
-    point.y = random_between(0, LINES/2 -1)*2;
+    point.x = random_between(0, COLS / 2 - 1) * 2;
+    point.y = random_between(0, LINES / 2 - 1) * 2;
     _generate(point);
 }
 
@@ -431,7 +443,8 @@ int main(void)
         init_pair(1, COLOR_RED, COLOR_RED);
         init_pair(2, COLOR_GREEN, COLOR_GREEN);
         init_pair(3, COLOR_WHITE, COLOR_WHITE);
-        init_pair(4, COLOR_WHITE, COLOR_WHITE);
+        init_pair(4, COLOR_BLACK, COLOR_BLACK);
+        init_pair(5, COLOR_RED, COLOR_BLACK);
     }
     else
     {
@@ -458,12 +471,9 @@ begin:
         prev_pos.x = pos.x;
         prev_pos.y = pos.y;
 
-        //printw("Le terminal actuel comporte %d lignes et %d colonnes\n", LINES, COLS);
         draw_map();
-        doupdate(); // Rafraîchit la fenêtre par défaut (stdscr) afin d'afficher le message
+        doupdate();
         char c = getch();
-        //if (c != 410) // 410 est le code de la touche générée lorsqu'on redimensionne le terminal
-        //    break;
 
         if (c == '\033')
         {            // if the first value is esc
