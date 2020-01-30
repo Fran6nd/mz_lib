@@ -420,7 +420,7 @@ void _generate(struct position point)
         struct neighbor nb = get_pathables(point);
         //randomize_neighbor(&nb);
         draw_map();
-        refresh();
+        doupdate();
         usleep(3000);
 
         int i;
@@ -500,7 +500,7 @@ int main(void)
 
         //printw("Le terminal actuel comporte %d lignes et %d colonnes\n", LINES, COLS);
         draw_map();
-        refresh(); // Rafraîchit la fenêtre par défaut (stdscr) afin d'afficher le message
+        doupdate(); // Rafraîchit la fenêtre par défaut (stdscr) afin d'afficher le message
         char c = getch();
         //if (c != 410) // 410 est le code de la touche générée lorsqu'on redimensionne le terminal
         //    break;
