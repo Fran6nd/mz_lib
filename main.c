@@ -31,8 +31,8 @@ struct neighbor
     int n;
     struct position paths[8];
 };
-struct position pos = {4, 4};
-struct position prev_pos = {3, 4};
+struct position pos = {4, 3};
+struct position prev_pos = {4, 3};
 
 char *map;
 char get_tile(int _x, int _y)
@@ -97,7 +97,16 @@ void draw_map()
         pos.x = COLS - 1;
     }
     move(pos.y, pos.x);
-    addch('O');
+    if (has_colors)
+    {
+        attron(COLOR_PAIR(1));
+        addch('O');
+        attroff(COLOR_PAIR(1));
+    }
+    else
+    {
+        addch('O');
+    }
 }
 int is_on_map(struct position p)
 {
@@ -401,19 +410,21 @@ void _generate(struct position point)
         int i;
         if (nb.n)
         {
-            if(random_between(0,1) == 1){
-            for (i = 0; i < nb.n; i++)
+            if (random_between(0, 1) == 1)
             {
+                for (i = 0; i < nb.n; i++)
+                {
 
-                _generate(nb.paths[i]);
+                    _generate(nb.paths[i]);
+                }
             }
-            }
-            else{
-                    for (i = nb.n-1; i >= 0; i--)
+            else
             {
+                for (i = nb.n - 1; i >= 0; i--)
+                {
 
-                _generate(nb.paths[i]);
-            }        
+                    _generate(nb.paths[i]);
+                }
             }
         }
     }
@@ -427,11 +438,20 @@ void generate()
 
 int main(void)
 {
+    initscr();
+    curs_set(0);
+    if (has_colors)
+    {
+        start_color();
+        init_pair(1, COLOR_RED, COLOR_RED);
+    }
+    else
+    {
+        return 0;
+    }
     srand(time(NULL));
     WINDOW *boite;
 
-    initscr();
-    curs_set(0);
     map = malloc(((LINES * COLS)) * sizeof(char));
     memset(map, '+', LINES * COLS);
     generate();
@@ -445,7 +465,6 @@ int main(void)
 
         //printw("Le terminal actuel comporte %d lignes et %d colonnes\n", LINES, COLS);
         draw_map();
-        mvprintw(5, 5, msg);
         refresh(); // Rafraîchit la fenêtre par défaut (stdscr) afin d'afficher le message
         char c = getch();
         //if (c != 410) // 410 est le code de la touche générée lorsqu'on redimensionne le terminal
