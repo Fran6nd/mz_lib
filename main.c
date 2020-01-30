@@ -5,7 +5,14 @@
 #include <time.h>
 
 int running = 1;
-int error  = 0;
+int error = 0;
+
+char msg[100];
+
+void set_msg(char* s){
+    memset(msg, 0, 100);
+    memcpy(msg, s, strlen(s));
+}
 
 struct position
 {
@@ -112,7 +119,7 @@ void set_tile(int _x, int _y, char _c)
 {
     struct position p = {_x, _y};
     //if(is_on_map(p))
-        map[_y * COLS + _x] = _c;
+    map[_y * COLS + _x] = _c;
 }
 struct neighbor get_neighboors(struct position p)
 {
@@ -153,19 +160,22 @@ int is_pathable(struct position p)
 {
     if (is_on_map(p))
     {
-        struct neighbor nb = get_neighboors(p);
-        int i;
-        int j = 0;
-        for (i = 0; i < nb.n; i++)
+        if (get_tile(p.x, p.y) == '+')
         {
-            if (get_tile(nb.paths[i].x, nb.paths[i].y) != ' ')
+            struct neighbor nb = get_neighboors(p);
+            int i;
+            int j = 0;
+            for (i = 0; i < nb.n; i++)
             {
-                j++;
+                if (get_tile(nb.paths[i].x, nb.paths[i].y) == ' ')
+                {
+                    j++;
+                }
             }
-        }
-        if (j < 2)
-        {
-            return 1;
+            if (j < 2)
+            {
+                return 1;
+            }
         }
     }
     return 0;
@@ -207,19 +217,20 @@ struct neighbor get_pathables(struct position p)
 }
 void _generate(struct position point)
 {
+    set_msg("Started!");
     set_tile(point.x, point.y, ' ');
     struct neighbor nb = get_pathables(point);
     int i;
     for (i = 0; i < nb.n; i++)
     {
-      
+
         _generate(nb.paths[i]);
     }
-    if (nb.n < 0)
+    if (nb.n == -1)
     {
         //set_tile(2, 2, '*');
         running = 0;
-        error = nb.n;
+        error = 5;
     }
 }
 void generate()
@@ -253,6 +264,7 @@ int main(void)
 
         //printw("Le terminal actuel comporte %d lignes et %d colonnes\n", LINES, COLS);
         draw_map();
+        mvprintw(5, 5, msg);
         refresh(); // Rafraîchit la fenêtre par défaut (stdscr) afin d'afficher le message
         char c = getch();
         //if (c != 410) // 410 est le code de la touche générée lorsqu'on redimensionne le terminal
@@ -282,6 +294,7 @@ int main(void)
             pos.x = prev_pos.x;
             pos.y = prev_pos.y;
         }
+
     }
     free(map);
     endwin();
