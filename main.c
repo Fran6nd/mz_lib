@@ -48,21 +48,7 @@ int is_odd(int n)
     }
     return 0;
 }
-void fix_map()
-{
-    int _x = 0;
-    int _y = 0;
-    for (_y = 0; _y < LINES; _y++)
-    {
-        for (_x = 0; _x < COLS; _x++)
-        {
 
-            if (get_tile(_x, _y) == '+')
-            {
-            }
-        }
-    }
-}
 int can_move_v(struct position *p)
 {
     if (is_odd(p->x))
@@ -322,6 +308,84 @@ void randomize_neighbor(struct neighbor *nb)
         nb->paths[nb->n - 1] = p1;
     }
 }
+void fix_map()
+{
+    int _x = 0;
+    int _y = 0;
+    for (_y = 0; _y < LINES; _y++)
+    {
+        for (_x = 0; _x < COLS; _x++)
+        {
+
+            if (get_tile(_x, _y) == ' ')
+            {
+                set_tile(_x, _y, 254);
+            }
+            if (get_tile(_x, _y) == '+')
+            {
+                set_tile(_x, _y, ' ');
+            }
+
+            /*
+                struct neighbor nb = get_advanced_neighboors(p);
+                struct neighbor wall;
+                wall.n = 0;
+                int i = 0;
+                int j = 0;
+                for(; i<nb.n; i++)
+                {
+                    struct position p1;
+                    p1 = nb.paths[i];
+                    char c = get_tile(p1.x, p1.y);
+                    if(c == '+' || c == '-' || c=='|'){
+                        wall.paths[wall.n] = p1;
+                        wall.n++;
+
+                    }
+                }
+                {
+                    if (wall.n == 1)
+                    {
+                        if (wall.paths[0].x == p.x)
+                        {
+                            set_tile(_x, _y, '-');
+                        }
+                        else
+                        {
+                            set_tile(_x, _y, '|');
+                        }
+                    }
+                    else if (wall.n == 2)
+                    {
+                        int v = 0;
+                        int h = 0;
+                        if (wall.paths[0].x != p.x)
+                        {
+                            h++;
+                        }
+                        if (wall.paths[1].x != p.x)
+                        {
+                            h++;
+                        }
+                        if (wall.paths[0].y != p.y)
+                        {
+                            v++;
+                        }
+                        if (wall.paths[1].y != p.y)
+                        {
+                            v++;
+                        }
+                        if(v == 2){
+                            set_tile(_x, _y, '|');
+                        }
+                        if(h == 2){
+                            set_tile(_x, _y, '-');
+                        }
+                    }
+                }*/
+        }
+    }
+}
 void _generate(struct position point)
 {
     if (is_pathable(point))
@@ -362,6 +426,7 @@ int main(void)
     map = malloc(((LINES * COLS)) * sizeof(char));
     memset(map, '+', LINES * COLS);
     generate();
+    fix_map();
     //memset(map, (LINES * COLS), 'z');
 
     while (running)
@@ -396,8 +461,11 @@ int main(void)
                 break;
             }
         }
-        if (get_tile(pos.x, pos.y) != ' ')
+        if (get_tile(pos.x, pos.y) == ' ')
         {
+            char str[12];
+            sprintf(str, "--%c--", get_tile(pos.x, pos.y));
+            set_msg(str);
             pos.x = prev_pos.x;
             pos.y = prev_pos.y;
         }
