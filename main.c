@@ -163,12 +163,12 @@ int is_pathable(struct position p)
                 j++;
             }
         }
-        if (j > 1)
+        if (j < 2)
         {
-            return 0;
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 struct neighbor get_pathables(struct position p)
 {
@@ -207,7 +207,7 @@ struct neighbor get_pathables(struct position p)
 }
 void _generate(struct position point)
 {
-    //set_tile(point.x, point.y, ' ');
+    set_tile(point.x, point.y, ' ');
     struct neighbor nb = get_pathables(point);
     int i;
     for (i = 0; i < nb.n; i++)
@@ -225,7 +225,7 @@ void _generate(struct position point)
 void generate()
 {
     struct position prev_point = {0, 0};
-    struct position point = {0, 0};
+    struct position point = {10, 10};
     _generate(point);
 }
 
