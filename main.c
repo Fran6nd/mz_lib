@@ -360,33 +360,13 @@ void randomize_neighbor(struct neighbor *nb)
         nb->paths[nb->n - 1] = p1;
     }
 }
-void fix_map()
-{
-    int _x = 0;
-    int _y = 0;
-    for (_y = 0; _y < LINES; _y++)
-    {
-        for (_x = 0; _x < COLS; _x++)
-        {
 
-            if (get_tile(_x, _y) == ' ')
-            {
-                set_tile(_x, _y, 254);
-            }
-            if (get_tile(_x, _y) == '+')
-            {
-                set_tile(_x, _y, ' ');
-            }
-        }
-    }
-}
 void _generate(struct position point)
 {
     if (is_pathable(point))
     {
         set_tile(point.x, point.y, ' ');
         struct neighbor nb = get_pathables(point);
-        //randomize_neighbor(&nb);
         draw_map();
         refresh();
         usleep(3000);
@@ -429,7 +409,7 @@ void generate()
 {
     struct position point;
     point.x = random_between(0, COLS / 2 - 1) * 2;
-    point.y = random_between(0, LINES / 2 - 1) * 2;
+    point.y = random_between(0, LINES / 2 - 1) * 2 + 1;
     _generate(point);
 }
 
@@ -462,9 +442,7 @@ begin:
     prev_pos.y = pos.y;
     end_point = find_random_path();
     generating = 0;
-    //fix_map();
 
-    //memset(map, (LINES * COLS), 'z');
 
     while (running)
     {
@@ -476,10 +454,10 @@ begin:
         char c = getch();
 
         if (c == '\033')
-        {            // if the first value is esc
-            getch(); // skip the [
+        { 
+            getch();
             switch (getch())
-            { // the real value
+            {
             case 'A':
                 pos.y--;
                 break;
