@@ -138,6 +138,22 @@ struct neighbor get_neighboors(struct position p){
         nb.n++;
     }
 }
+int is_pathable(struct position p){
+    struct neighbor nb = get_neighboors(p);
+    int i;
+    int j = 0;
+    for(i = 0; i < nb.n; i++)
+    {
+        if(get_tile(nb.paths[i].x, nb.paths[i].y) != ' ')
+        {
+            j++;
+        }
+    }
+    if (j>1){
+        return 0;
+    }
+    return 1;
+}
 void generate()
 {
     struct position p = {0, 0};
