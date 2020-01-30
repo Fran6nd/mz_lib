@@ -447,17 +447,19 @@ void _generate(struct position point)
 }
 struct position find_random_path()
 {
+    struct position p;
+    do{
+    
+        p.x = random_between(0, COLS - 2) + 1;
+    p.y = random_between(0, LINES - 2) + 1;
+    }while(get_tile(p.x, p.y) == '+');
+    return p;
+
 }
 
 void generate()
 {
-    end_point.x = random_between(0, (COLS - 1) / 22) * 2;
-    end_point.y = random_between(0, (LINES - 1) / 2) * 2 + 1;
-    if (get_tile(end_point.x, end_point.y) != ' ')
-    {
-    }
-    struct position prev_point = {0, 0};
-    struct position point = {10, 10};
+    struct position point;
     point.x = random_between(0, COLS - 2) + 1;
     point.y = random_between(0, LINES - 2) + 1;
     _generate(point);
@@ -482,6 +484,10 @@ int main(void)
     map = malloc(((LINES * COLS)) * sizeof(char));
     memset(map, '+', LINES * COLS);
     generate();
+    pos = find_random_path();
+    prev_pos.x = pos.x;
+    prev_pos.y = pos.y;
+    end_point = find_random_path();
     generating = 0;
     fix_map();
 
