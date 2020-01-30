@@ -401,10 +401,19 @@ void _generate(struct position point)
         int i;
         if (nb.n)
         {
+            if(random_between(0,1) == 1){
             for (i = 0; i < nb.n; i++)
             {
 
                 _generate(nb.paths[i]);
+            }
+            }
+            else{
+                    for (i = nb.n-1; i >= 0; i--)
+            {
+
+                _generate(nb.paths[i]);
+            }        
             }
         }
     }
@@ -463,9 +472,6 @@ int main(void)
         }
         if (get_tile(pos.x, pos.y) == ' ')
         {
-            char str[12];
-            sprintf(str, "--%c--", get_tile(pos.x, pos.y));
-            set_msg(str);
             pos.x = prev_pos.x;
             pos.y = prev_pos.y;
         }
