@@ -29,10 +29,10 @@ struct position
 struct neighbor
 {
     int n;
-    struct position paths[4];
+    struct position paths[8];
 };
-struct position pos = {1, 1};
-struct position prev_pos = {1, 1};
+struct position pos = {4, 4};
+struct position prev_pos = {3, 4};
 
 char *map;
 char get_tile(int _x, int _y)
@@ -110,7 +110,7 @@ void draw_map()
     {
         pos.x = COLS - 1;
     }
-    move(pos.y, pos.x);
+    move(pos.x, pos.y);
     addch('O');
 }
 int is_on_map(struct position p)
@@ -163,25 +163,83 @@ struct neighbor get_neighboors(struct position p)
     }
     return nb;
 }
+struct neighbor get_advanced_neighboors(struct position p)
+{
+    struct position up, down, right, left;
+    up.x = p.x;
+    up.y = p.y - 1;
+    down.x = p.x;
+    down.y = p.y + 1;
+    right.y = p.y;
+    right.x = p.x + 1;
+    left.y = p.y;
+    left.x = p.x - 1;
+    struct position up_right = {p.x+1,p.y-1}, down_right = {p.x +1,p.y+1},down_left = {p.x-1,p.y+1} , up_left = {p.x-1,p.y-1};
+
+    struct neighbor nb;
+    nb.n = 0;
+    if (is_on_map(up))
+    {
+        nb.paths[nb.n] = up;
+        nb.n++;
+    }
+    if (is_on_map(down))
+    {
+        nb.paths[nb.n] = down;
+        nb.n++;
+    }
+    if (is_on_map(right))
+    {
+        nb.paths[nb.n] = right;
+        nb.n++;
+    }
+    if (is_on_map(left))
+    {
+        nb.paths[nb.n] = left;
+        nb.n++;
+    }
+    if (is_on_map(up_left))
+    {
+        nb.paths[nb.n] = up_left;
+        nb.n++;
+    }
+    if (is_on_map(up_right))
+    {
+        nb.paths[nb.n] = up_right;
+        nb.n++;
+    }
+    if (is_on_map(down_left))
+    {
+        nb.paths[nb.n] = down_left;
+        nb.n++;
+    }
+    if (is_on_map(down_right))
+    {
+        nb.paths[nb.n] = down_right;
+        nb.n++;
+    }
+    return nb;
+}
+
 int is_pathable(struct position p)
 {
     if (is_on_map(p))
     {
         if (get_tile(p.x, p.y) == '+')
         {
-            struct neighbor nb = get_neighboors(p);
+            struct neighbor nb = get_advanced_neighboors(p);
             if (nb.n == 4)
             {
                 int i;
                 int j = 0;
                 for (i = 0; i < nb.n; i++)
                 {
-                    if (get_tile(nb.paths[i].x, nb.paths[i].y) == '+')
+                    if (get_tile(nb.paths[i].x, nb.paths[i].y) == ' ')
                     {
                         j++;
                     }
                 }
-                if (j == 3)
+                if (j == 1)
                 {
                     return 1;
                 }
