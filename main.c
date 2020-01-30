@@ -70,7 +70,7 @@ int can_move_h(struct position *p)
 
 void draw_map()
 {
-    clear();
+    //clear();
     int _x = 0;
     int _y = 0;
     for (_y = 0; _y < LINES; _y++)
@@ -79,7 +79,21 @@ void draw_map()
         {
             //mvprintw(_y, _x, get_tile(_x, _y));
             move(_y, _x);
-            addch(get_tile(_x, _y));
+            if (has_colors && get_tile(_x, _y) == '+')
+            {
+                //attron(COLOR_PAIR(3));
+                addch(' ');
+                //attroff(COLOR_PAIR(3));
+            }
+            else if (has_colors && get_tile(_x, _y) == ' '){
+                attron(COLOR_PAIR(4));
+                addch(' ');
+                attroff(COLOR_PAIR(4));
+            }
+            else
+            {
+                addch(get_tile(_x, _y));
+            }
         }
     }
     if (pos.y < 0)
@@ -350,64 +364,6 @@ void fix_map()
             {
                 set_tile(_x, _y, ' ');
             }
-
-            /*
-                struct neighbor nb = get_advanced_neighboors(p);
-                struct neighbor wall;
-                wall.n = 0;
-                int i = 0;
-                int j = 0;
-                for(; i<nb.n; i++)
-                {
-                    struct position p1;
-                    p1 = nb.paths[i];
-                    char c = get_tile(p1.x, p1.y);
-                    if(c == '+' || c == '-' || c=='|'){
-                        wall.paths[wall.n] = p1;
-                        wall.n++;
-
-                    }
-                }
-                {
-                    if (wall.n == 1)
-                    {
-                        if (wall.paths[0].x == p.x)
-                        {
-                            set_tile(_x, _y, '-');
-                        }
-                        else
-                        {
-                            set_tile(_x, _y, '|');
-                        }
-                    }
-                    else if (wall.n == 2)
-                    {
-                        int v = 0;
-                        int h = 0;
-                        if (wall.paths[0].x != p.x)
-                        {
-                            h++;
-                        }
-                        if (wall.paths[1].x != p.x)
-                        {
-                            h++;
-                        }
-                        if (wall.paths[0].y != p.y)
-                        {
-                            v++;
-                        }
-                        if (wall.paths[1].y != p.y)
-                        {
-                            v++;
-                        }
-                        if(v == 2){
-                            set_tile(_x, _y, '|');
-                        }
-                        if(h == 2){
-                            set_tile(_x, _y, '-');
-                        }
-                    }
-                }*/
         }
     }
 }
@@ -448,20 +404,20 @@ void _generate(struct position point)
 struct position find_random_path()
 {
     struct position p;
-    do{
-    
-        p.x = random_between(0, COLS - 2) + 1;
-    p.y = random_between(0, LINES - 2) + 1;
-    }while(get_tile(p.x, p.y) == '+');
-    return p;
+    do
+    {
 
+        p.x = random_between(0, COLS - 2) + 1;
+        p.y = random_between(0, LINES - 2) + 1;
+    } while (get_tile(p.x, p.y) == '+');
+    return p;
 }
 
 void generate()
 {
     struct position point;
-    point.x = random_between(0, COLS - 2) + 1;
-    point.y = random_between(0, LINES - 2) + 1;
+    point.x = random_between(0, COLS/2 - 1) * 2;
+    point.y = random_between(0, LINES/2 -1)*2;
     _generate(point);
 }
 
@@ -474,6 +430,8 @@ int main(void)
         start_color();
         init_pair(1, COLOR_RED, COLOR_RED);
         init_pair(2, COLOR_GREEN, COLOR_GREEN);
+        init_pair(3, COLOR_WHITE, COLOR_WHITE);
+        init_pair(4, COLOR_WHITE, COLOR_WHITE);
     }
     else
     {
@@ -483,7 +441,7 @@ int main(void)
     WINDOW *boite;
 
     map = malloc(((LINES * COLS)) * sizeof(char));
-    begin:
+begin:
     memset(map, '+', LINES * COLS);
     generate();
     pos = find_random_path();
@@ -491,7 +449,7 @@ int main(void)
     prev_pos.y = pos.y;
     end_point = find_random_path();
     generating = 0;
-    fix_map();
+    //fix_map();
 
     //memset(map, (LINES * COLS), 'z');
 
@@ -526,12 +484,13 @@ int main(void)
                 break;
             }
         }
-        if (get_tile(pos.x, pos.y) == ' ')
+        if (get_tile(pos.x, pos.y) != ' ')
         {
             pos.x = prev_pos.x;
             pos.y = prev_pos.y;
         }
-        if(pos.x == end_point.x && pos.y == end_point.y){
+        if (pos.x == end_point.x && pos.y == end_point.y)
+        {
             running = 0;
         }
     }
