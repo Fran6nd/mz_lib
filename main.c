@@ -2,6 +2,7 @@
 #include <ncurses.h>
 
 #include <string.h>
+#include <unistd.h>
 #include <time.h>
 
 int running = 1;
@@ -9,7 +10,13 @@ int error = 0;
 
 char msg[100];
 
-void set_msg(char* s){
+int random_between(int min, int max)
+{
+    return rand() % ((max + 1) - min) + min;
+}
+
+void set_msg(char *s)
+{
     memset(msg, 0, 100);
     memcpy(msg, s, strlen(s));
 }
@@ -24,8 +31,8 @@ struct neighbor
     int n;
     struct position paths[4];
 };
-struct position pos = {0, 0};
-struct position prev_pos = {0, 0};
+struct position pos = {1, 1};
+struct position prev_pos = {1, 1};
 
 char *map;
 char get_tile(int _x, int _y)
@@ -56,7 +63,7 @@ void fix_map()
         }
     }
 }
-int can_move_h(struct position *p)
+int can_move_v(struct position *p)
 {
     if (is_odd(p->x))
     {
@@ -64,7 +71,7 @@ int can_move_h(struct position *p)
     }
     return 0;
 }
-int can_move_v(struct position *p)
+int can_move_h(struct position *p)
 {
     if (is_odd(p->y))
     {
@@ -163,18 +170,21 @@ int is_pathable(struct position p)
         if (get_tile(p.x, p.y) == '+')
         {
             struct neighbor nb = get_neighboors(p);
-            int i;
-            int j = 0;
-            for (i = 0; i < nb.n; i++)
+            if (nb.n == 4)
             {
-                if (get_tile(nb.paths[i].x, nb.paths[i].y) == ' ')
+                int i;
+                int j = 0;
+                for (i = 0; i < nb.n; i++)
                 {
-                    j++;
+                    if (get_tile(nb.paths[i].x, nb.paths[i].y) == '+')
+                    {
+                        j++;
+                    }
                 }
-            }
-            if (j < 2)
-            {
-                return 1;
+                if (j == 3)
+                {
+                    return 1;
+                }
             }
         }
     }
@@ -193,56 +203,77 @@ struct neighbor get_pathables(struct position p)
     left.x = p.x - 1;
     struct neighbor nb;
     nb.n = 0;
-    if (is_pathable(up) && can_move_h(&p))
+    if (is_pathable(up) && can_move_v(&p))
     {
         nb.paths[nb.n] = up;
         nb.n++;
     }
-    if (is_pathable(down) && can_move_h(&p))
+    if (is_pathable(down) && can_move_v(&p))
     {
         nb.paths[nb.n] = down;
         nb.n++;
     }
-    if (is_pathable(right) && can_move_v(&p))
+    if (is_pathable(right) && can_move_h(&p))
     {
         nb.paths[nb.n] = right;
         nb.n++;
     }
-    if (is_pathable(left) && can_move_v(&p))
+    if (is_pathable(left) && can_move_h(&p))
     {
         nb.paths[nb.n] = left;
         nb.n++;
     }
     return nb;
 }
+void randomize_neighbor(struct neighbor *nb)
+{
+    if (nb->n > 1)
+    {
+        int index = random_between(0, nb->n);
+        int i2 = random_between(0, nb->n);
+        struct position p1;
+        struct position p2;
+        p1 = nb->paths[index];
+        struct position paths2[4];
+
+        int i;
+        for (i = 0; i < nb->n; i++)
+        {
+            paths2[i] = nb->paths[i];
+        }
+        for (i = index; i < nb->n - 1; i++)
+        {
+            nb->paths[i] = paths2[i + 1];
+        }
+        nb->paths[nb->n - 1] = p1;
+    }
+}
 void _generate(struct position point)
 {
     set_msg("Started!");
     set_tile(point.x, point.y, ' ');
     struct neighbor nb = get_pathables(point);
-    int i;
-    for (i = 0; i < nb.n; i++)
-    {
+    //randomize_neighbor(&nb);
+    draw_map();
+    refresh();
+    usleep(3000);
 
-        _generate(nb.paths[i]);
-    }
-    if (nb.n == -1)
+    int i;
+    if (nb.n)
     {
-        //set_tile(2, 2, '*');
-        running = 0;
-        error = 5;
+        for (i = 0; i < nb.n; i++)
+        {
+
+            _generate(nb.paths[i]);
+        }
     }
+
 }
 void generate()
 {
     struct position prev_point = {0, 0};
     struct position point = {10, 10};
     _generate(point);
-}
-
-int random_between(int min, int max)
-{
-    return rand() % ((max + 1) - min) + min;
 }
 
 int main(void)
@@ -294,7 +325,6 @@ int main(void)
             pos.x = prev_pos.x;
             pos.y = prev_pos.y;
         }
-
     }
     free(map);
     endwin();
