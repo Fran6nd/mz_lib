@@ -114,9 +114,9 @@ void draw_map()
         move(end_point.y, end_point.x);
         if (has_colors)
         {
-            attron(COLOR_PAIR(1));
+            attron(COLOR_PAIR(2));
             addch('O');
-            attroff(COLOR_PAIR(1));
+            attroff(COLOR_PAIR(2));
         }
         else
         {
@@ -420,7 +420,7 @@ void _generate(struct position point)
         struct neighbor nb = get_pathables(point);
         //randomize_neighbor(&nb);
         draw_map();
-        doupdate();
+        refresh();
         usleep(3000);
 
         int i;
@@ -473,6 +473,7 @@ int main(void)
     {
         start_color();
         init_pair(1, COLOR_RED, COLOR_RED);
+        init_pair(2, COLOR_GREEN, COLOR_GREEN);
     }
     else
     {
@@ -482,6 +483,7 @@ int main(void)
     WINDOW *boite;
 
     map = malloc(((LINES * COLS)) * sizeof(char));
+    begin:
     memset(map, '+', LINES * COLS);
     generate();
     pos = find_random_path();
@@ -529,7 +531,12 @@ int main(void)
             pos.x = prev_pos.x;
             pos.y = prev_pos.y;
         }
+        if(pos.x == end_point.x && pos.y == end_point.y){
+            running = 0;
+        }
     }
+    running = 1;
+    goto begin;
     free(map);
     endwin();
 
