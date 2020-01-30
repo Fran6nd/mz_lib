@@ -8,6 +8,7 @@
 int running = 1;
 int error = 0;
 int generating = 1;
+int generate_delay = 1000;
 
 int random_between(int min, int max)
 {
@@ -367,10 +368,14 @@ void _generate(struct position point)
     {
         set_tile(point.x, point.y, ' ');
         struct neighbor nb = get_pathables(point);
-        draw_map();
-        refresh();
+        if (generate_delay)
+        {
+            draw_map();
+            refresh();
+        }
+
         /* Want it faster? Remove the following line :) */
-        usleep(1000);
+        usleep(generate_delay);
 
         int i;
         if (nb.n)
@@ -414,8 +419,49 @@ void generate()
     _generate(point);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    if (argc == 2)
+    {
+        if (strcmp(argv[1], "-h") == 0)
+        {
+            printf("------------------------------------------\n");
+            printf("MazeCurses, a maze game made with ncurses.\n");
+            printf("------------------------------------------\n");
+            printf("by Fran6nd\n\n");
+            printf("Usage:\n");
+            printf("./MazeCurses\n");
+            printf("./MazeCurses -h to display help.\n");
+            printf("./MazeCurses --delay [int] to set the maze's generation's delay (us).\n");
+            printf("./MazeCurses --nodelay to set the maze's geneartion as fast as possible.\n");
+            return 0;
+        }
+        else if (strcmp(argv[1], "-nodelay") == 0)
+        {
+            generate_delay = 0;
+        }
+        else
+        {
+            printf("Unknown arg \"%s\" see -h for help.\n", argv[1]);
+            return 0;
+        }
+    }
+    else if (argc == 3)
+    {
+        if (strcmp(argv[1], "--delay") == 0)
+        {
+            generate_delay = atoi(argv[2]);
+        }
+        else{
+            printf("Unknown arg \"%s\" see -h for help.\n", argv[1]);
+            return 0;
+        }
+    }
+    else if(argc>3){
+        printf("Too many args... see -h for help.\n");
+        return 0;
+    }
+
     initscr();
     curs_set(0);
     if (has_colors)
