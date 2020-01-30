@@ -4,12 +4,16 @@
 #include <string.h>
 #include <time.h>
 
+int running = 1;
+int error  = 0;
+
 struct position
 {
     int x;
     int y;
 };
-struct neighbor {
+struct neighbor
+{
     int n;
     struct position paths[4];
 };
@@ -39,8 +43,8 @@ void fix_map()
         for (_x = 0; _x < COLS; _x++)
         {
 
-            if(get_tile(_x, _y) == '+'){
-
+            if (get_tile(_x, _y) == '+')
+            {
             }
         }
     }
@@ -55,13 +59,12 @@ int can_move_h(struct position *p)
 }
 int can_move_v(struct position *p)
 {
-    if (is_odd(p->x))
+    if (is_odd(p->y))
     {
         return 0;
     }
     return 1;
 }
-
 
 void draw_map()
 {
@@ -109,56 +112,118 @@ void set_tile(int _x, int _y, char _c)
 {
     map[_y * COLS + _x] = _c;
 }
-struct neighbor get_neighboors(struct position p){
+struct neighbor get_neighboors(struct position p)
+{
     struct position up, down, right, left;
     up.x = p.x;
     up.y = p.y - 1;
     down.x = p.x;
     down.y = p.y + 1;
     right.y = right.y;
-    right.x = right.x +1;
+    right.x = right.x + 1;
     left.y = p.y;
     left.x = left.x - 1;
     struct neighbor nb;
     nb.n = 0;
-    if(is_on_map(up)){
+    if (is_on_map(up))
+    {
         nb.paths[nb.n] = up;
         nb.n++;
     }
-    if(is_on_map(down)){
+    if (is_on_map(down))
+    {
         nb.paths[nb.n] = down;
         nb.n++;
     }
-    if(is_on_map(right)){
+    if (is_on_map(right))
+    {
         nb.paths[nb.n] = right;
         nb.n++;
     }
-    if(is_on_map(left)){
+    if (is_on_map(left))
+    {
         nb.paths[nb.n] = left;
         nb.n++;
     }
 }
-int is_pathable(struct position p){
-    struct neighbor nb = get_neighboors(p);
-    int i;
-    int j = 0;
-    for(i = 0; i < nb.n; i++)
+int is_pathable(struct position p)
+{
+    if (is_on_map(p))
     {
-        if(get_tile(nb.paths[i].x, nb.paths[i].y) != ' ')
+        struct neighbor nb = get_neighboors(p);
+        int i;
+        int j = 0;
+        for (i = 0; i < nb.n; i++)
         {
-            j++;
+            if (get_tile(nb.paths[i].x, nb.paths[i].y) != ' ')
+            {
+                j++;
+            }
         }
-    }
-    if (j>1){
-        return 0;
+        if (j > 1)
+        {
+            return 0;
+        }
     }
     return 1;
 }
+struct neighbor get_pathables(struct position p)
+{
+    struct position up, down, right, left;
+    up.x = p.x;
+    up.y = p.y - 1;
+    down.x = p.x;
+    down.y = p.y + 1;
+    right.y = right.y;
+    right.x = right.x + 1;
+    left.y = p.y;
+    left.x = left.x - 1;
+    struct neighbor nb;
+    nb.n = 0;
+    if (is_pathable(up) && can_move_h(&p))
+    {
+        nb.paths[nb.n] = up;
+        nb.n++;
+    }
+    if (is_pathable(down) && can_move_h(&p))
+    {
+        nb.paths[nb.n] = down;
+        nb.n++;
+    }
+    if (is_pathable(right) && can_move_v(&p))
+    {
+        nb.paths[nb.n] = right;
+        nb.n++;
+    }
+    if (is_pathable(left) && can_move_v(&p))
+    {
+        nb.paths[nb.n] = left;
+        nb.n++;
+    }
+}
+void _generate(struct position point)
+{
+    set_tile(point.x, point.y, ' ');
+    struct neighbor nb = get_pathables(point);
+    int i;
+    for (i = 0; i < nb.n; i++)
+    {
+        _generate(nb.paths[i]);
+    }
+    if (nb.n < 0)
+    {
+        set_tile(2, 2, '*');
+        running = 0;
+        error = nb.n;
+    }
+}
 void generate()
 {
-    struct position p = {0, 0};
-
+    struct position prev_point = {0, 0};
+    struct position point = {15, 15};
+    _generate(point);
 }
+
 int random_between(int min, int max)
 {
     return rand() % ((max + 1) - min) + min;
@@ -172,16 +237,15 @@ int main(void)
     initscr();
     curs_set(0);
     map = malloc(((LINES * COLS)) * sizeof(char));
-    memset(map, ' ', LINES * COLS);
+    memset(map, '+', LINES * COLS);
+    generate();
     //memset(map, (LINES * COLS), 'z');
-    set_tile(5, 5, '+');
-    set_tile(5, 8, '+');
-    set_tile(5, 9, '+');
-    set_tile(6, 8, '+');
-    while (1)
+
+    while (running)
     {
         prev_pos.x = pos.x;
         prev_pos.y = pos.y;
+
         //printw("Le terminal actuel comporte %d lignes et %d colonnes\n", LINES, COLS);
         draw_map();
         refresh(); // Rafraîchit la fenêtre par défaut (stdscr) afin d'afficher le message
@@ -217,5 +281,5 @@ int main(void)
     free(map);
     endwin();
 
-    return 0;
+    return error;
 }
