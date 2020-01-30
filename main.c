@@ -7,6 +7,7 @@
 
 int running = 1;
 int error = 0;
+int generating = 1;
 
 char msg[100];
 
@@ -33,6 +34,7 @@ struct neighbor
 };
 struct position pos = {4, 3};
 struct position prev_pos = {4, 3};
+struct position end_point;
 
 char *map;
 char get_tile(int _x, int _y)
@@ -96,16 +98,30 @@ void draw_map()
     {
         pos.x = COLS - 1;
     }
-    move(pos.y, pos.x);
-    if (has_colors)
+    if (!generating)
     {
-        attron(COLOR_PAIR(1));
-        addch('O');
-        attroff(COLOR_PAIR(1));
-    }
-    else
-    {
-        addch('O');
+        move(pos.y, pos.x);
+        if (has_colors)
+        {
+            attron(COLOR_PAIR(1));
+            addch('O');
+            attroff(COLOR_PAIR(1));
+        }
+        else
+        {
+            addch('O');
+        }
+        move(end_point.y, end_point.x);
+        if (has_colors)
+        {
+            attron(COLOR_PAIR(1));
+            addch('O');
+            attroff(COLOR_PAIR(1));
+        }
+        else
+        {
+            addch('O');
+        }
     }
 }
 int is_on_map(struct position p)
@@ -429,10 +445,21 @@ void _generate(struct position point)
         }
     }
 }
+struct position find_random_path()
+{
+}
+
 void generate()
 {
+    end_point.x = random_between(0, (COLS - 1) / 22) * 2;
+    end_point.y = random_between(0, (LINES - 1) / 2) * 2 + 1;
+    if (get_tile(end_point.x, end_point.y) != ' ')
+    {
+    }
     struct position prev_point = {0, 0};
     struct position point = {10, 10};
+    point.x = random_between(0, COLS - 2) + 1;
+    point.y = random_between(0, LINES - 2) + 1;
     _generate(point);
 }
 
@@ -455,7 +482,9 @@ int main(void)
     map = malloc(((LINES * COLS)) * sizeof(char));
     memset(map, '+', LINES * COLS);
     generate();
+    generating = 0;
     fix_map();
+
     //memset(map, (LINES * COLS), 'z');
 
     while (running)
