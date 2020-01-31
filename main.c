@@ -86,7 +86,7 @@ void draw_map()
             else if (has_colors && get_tile(_x, _y) == ' ')
             {
                 attron(COLOR_PAIR(3));
-                addch(' ');
+                addch(ACS_CKBOARD);
                 attroff(COLOR_PAIR(3));
             }
             else
@@ -185,7 +185,6 @@ int is_on_map(struct position p)
 void set_tile(int _x, int _y, char _c)
 {
     struct position p = {_x, _y};
-    //if(is_on_map(p))
     map[_y * COLS + _x] = _c;
 }
 struct neighbor get_neighboors(struct position p)
@@ -493,7 +492,7 @@ int main(int argc, char *argv[])
         start_color();
         init_pair(1, COLOR_RED, COLOR_RED);
         init_pair(2, COLOR_GREEN, COLOR_GREEN);
-        init_pair(3, COLOR_WHITE, COLOR_WHITE);
+        init_pair(3, COLOR_BLACK, COLOR_WHITE);
         init_pair(4, COLOR_BLACK, COLOR_BLACK);
         init_pair(5, COLOR_RED, COLOR_BLACK);
     }
