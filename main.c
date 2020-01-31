@@ -388,29 +388,6 @@ struct neighbor get_pathables(struct position p)
     }
     return nb;
 }
-void randomize_neighbor(struct neighbor *nb)
-{
-    if (nb->n > 1)
-    {
-        int index = random_between(0, nb->n);
-        int i2 = random_between(0, nb->n);
-        struct position p1;
-        struct position p2;
-        p1 = nb->paths[index];
-        struct position paths2[4];
-
-        int i;
-        for (i = 0; i < nb->n; i++)
-        {
-            paths2[i] = nb->paths[i];
-        }
-        for (i = index; i < nb->n - 1; i++)
-        {
-            nb->paths[i] = paths2[i + 1];
-        }
-        nb->paths[nb->n - 1] = p1;
-    }
-}
 
 void _generate(struct position point)
 {
@@ -449,7 +426,7 @@ void _generate(struct position point)
         }
     }
 }
-void find_random_path(struct position * p)
+void find_random_path(struct position *p)
 {
     do
     {
