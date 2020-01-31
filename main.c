@@ -9,6 +9,7 @@ int RUNNING = 1;
 int ERROR = 0;
 int GENERATING = 1;
 int GENERATE_DELAY = 1000;
+WINDOW *mWINDOW;
 
 int random_between(int min, int max)
 {
@@ -72,9 +73,15 @@ void draw_map()
             move(_y, _x);
             if (has_colors && get_tile(_x, _y) == '+')
             {
-                attron(COLOR_PAIR(4));
-                addch(' ');
-                attroff(COLOR_PAIR(4));
+                if (_x == 0 || _y == 0 || _x == COLS - 1 || _y == LINES - 1)
+                {
+                }
+                else
+                {
+                    attron(COLOR_PAIR(4));
+                    addch(' ');
+                    attroff(COLOR_PAIR(4));
+                }
             }
             else if (has_colors && get_tile(_x, _y) == ' ')
             {
@@ -104,6 +111,20 @@ void draw_map()
     {
         pos.x = COLS - 1;
     }
+    attron(COLOR_PAIR(5));
+    move(0, 0);
+    hline(ACS_HLINE, COLS - 1);
+    vline(ACS_VLINE, LINES - 1);
+    addch(ACS_ULCORNER);
+    move(LINES - 1, 0);
+    hline(ACS_HLINE, COLS - 1);
+    addch(ACS_LLCORNER);
+    move(0, COLS - 1);
+    vline(ACS_VLINE, LINES - 1);
+    addch(ACS_URCORNER);
+    move(LINES - 1, COLS - 1);
+    addch(ACS_LRCORNER);
+    attroff(COLOR_PAIR(5));
     if (!GENERATING)
     {
         move(pos.y, pos.x);
@@ -133,23 +154,23 @@ void draw_map()
     if (has_colors)
     {
         attron(COLOR_PAIR(5));
-        printw("MazeCurses by Fran6nd\n");
+        printw("MazeCurses by Fran6nd.");
         attroff(COLOR_PAIR(5));
     }
     else
     {
-        printw("MazeCurses by Fran6nd\n");
+        printw("MazeCurses by Fran6nd.");
     }
     move(LINES - 1, COLS - 20);
     if (has_colors)
     {
         attron(COLOR_PAIR(5));
-        printw("Press [q] to exit.\n");
+        printw("Press [q] to exit.");
         attroff(COLOR_PAIR(5));
     }
     else
     {
-        printw("Press [q] to exit.\n");
+        printw("Press [q] to exit.");
     }
 }
 int is_on_map(struct position p)
@@ -465,6 +486,7 @@ int main(int argc, char *argv[])
     }
 
     initscr();
+    mWINDOW = newwin(LINES, COLS, 0, 0);
     curs_set(0);
     if (has_colors)
     {
@@ -480,7 +502,6 @@ int main(int argc, char *argv[])
         return 0;
     }
     srand(time(NULL));
-    WINDOW *boite;
 
     map = malloc(((LINES * COLS)) * sizeof(char));
 begin:
