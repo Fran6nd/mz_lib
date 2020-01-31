@@ -5,6 +5,12 @@
 #include <unistd.h>
 #include <time.h>
 
+#define COL_RED 1
+#define COL_GREEN 2
+#define COL_GREY 3
+#define COL_BLACK 4
+#define COL_RED_BLACK 5
+
 int RUNNING = 1;
 int ERROR = 0;
 int GENERATING = 1;
@@ -78,16 +84,16 @@ void draw_map()
                 }
                 else
                 {
-                    attron(COLOR_PAIR(4));
+                    attron(COLOR_PAIR(COL_BLACK));
                     addch(' ');
-                    attroff(COLOR_PAIR(4));
+                    attroff(COLOR_PAIR(COL_BLACK));
                 }
             }
             else if (has_colors && get_tile(_x, _y) == ' ')
             {
-                attron(COLOR_PAIR(3));
+                attron(COLOR_PAIR(COL_GREY));
                 addch(ACS_CKBOARD);
-                attroff(COLOR_PAIR(3));
+                attroff(COLOR_PAIR(COL_GREY));
             }
             else
             {
@@ -111,7 +117,7 @@ void draw_map()
     {
         pos.x = COLS - 1;
     }
-    attron(COLOR_PAIR(5));
+    attron(COLOR_PAIR(COL_RED_BLACK));
     move(0, 0);
     hline(ACS_HLINE, COLS - 1);
     vline(ACS_VLINE, LINES - 1);
@@ -124,15 +130,15 @@ void draw_map()
     addch(ACS_URCORNER);
     move(LINES - 1, COLS - 1);
     addch(ACS_LRCORNER);
-    attroff(COLOR_PAIR(5));
+    attroff(COLOR_PAIR(COL_RED_BLACK));
     if (!GENERATING)
     {
         move(pos.y, pos.x);
         if (has_colors)
         {
-            attron(COLOR_PAIR(1));
+            attron(COLOR_PAIR(COL_RED));
             addch('O');
-            attroff(COLOR_PAIR(1));
+            attroff(COLOR_PAIR(COL_RED));
         }
         else
         {
@@ -141,9 +147,9 @@ void draw_map()
         move(end_point.y, end_point.x);
         if (has_colors)
         {
-            attron(COLOR_PAIR(2));
+            attron(COLOR_PAIR(COL_GREEN));
             addch('O');
-            attroff(COLOR_PAIR(2));
+            attroff(COLOR_PAIR(COL_GREEN));
         }
         else
         {
@@ -490,11 +496,11 @@ int main(int argc, char *argv[])
     if (has_colors)
     {
         start_color();
-        init_pair(1, COLOR_RED, COLOR_RED);
-        init_pair(2, COLOR_GREEN, COLOR_GREEN);
-        init_pair(3, COLOR_BLACK, COLOR_WHITE);
-        init_pair(4, COLOR_BLACK, COLOR_BLACK);
-        init_pair(5, COLOR_RED, COLOR_BLACK);
+        init_pair(COL_RED, COLOR_RED, COLOR_RED);
+        init_pair(COL_GREEN, COLOR_GREEN, COLOR_GREEN);
+        init_pair(COL_GREY, COLOR_BLACK, COLOR_WHITE);
+        init_pair(COL_BLACK, COLOR_BLACK, COLOR_BLACK);
+        init_pair(COL_RED_BLACK, COLOR_RED, COLOR_BLACK);
     }
     else
     {
