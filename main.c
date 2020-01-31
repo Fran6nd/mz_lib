@@ -133,12 +133,12 @@ void draw_map()
     if (has_colors)
     {
         attron(COLOR_PAIR(5));
-        printw("MazeCurses by fran6nd\n");
+        printw("MazeCurses by Fran6nd\n");
         attroff(COLOR_PAIR(5));
     }
     else
     {
-        printw("MazeCurses by fran6nd\n");
+        printw("MazeCurses by Fran6nd\n");
     }
     move(LINES - 1, COLS - 20);
     if (has_colors)
@@ -414,8 +414,8 @@ struct position find_random_path()
 void generate()
 {
     struct position point;
-    point.x = random_between(0, COLS / 2 - 1) * 2;
-    point.y = random_between(0, LINES / 2 - 1) * 2 + 1;
+    point.x = random_between(1, COLS / 2 - 1) * 2;
+    point.y = random_between(1, LINES / 2 - 1) * 2 + 1;
     _generate(point);
 }
 
