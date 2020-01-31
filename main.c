@@ -152,7 +152,7 @@ void draw_map()
     move(0, COLS - 1);
     vline(ACS_VLINE, LINES - 1);
     addch(ACS_URCORNER);
-    move(LINES - 1, _COLS - 1);
+    move(LINES - 1, COLS - 1);
     addch(ACS_LRCORNER);
     attroff(COLOR_PAIR(COL_RED_BLACK));
     if (!GENERATING)
