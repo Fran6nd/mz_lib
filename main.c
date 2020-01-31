@@ -15,7 +15,8 @@ int RUNNING = 1;
 int ERROR = 0;
 int GENERATING = 1;
 int GENERATE_DELAY = 1000;
-WINDOW *mWINDOW;
+int _LINES;
+int _COLS;
 
 int random_between(int min, int max)
 {
@@ -39,7 +40,7 @@ struct position end_point;
 char *map;
 char get_tile(int _x, int _y)
 {
-    return map[_y * COLS + _x];
+    return map[_y * _COLS + _x];
 }
 
 int is_odd(int n)
@@ -72,14 +73,37 @@ void draw_map()
 {
     int _x = 0;
     int _y = 0;
-    for (_y = 0; _y < LINES; _y++)
+    for (_y = 0; _y < _LINES; _y++)
     {
-        for (_x = 0; _x < COLS; _x++)
+        for (_x = 0; _x < _COLS; _x++)
         {
-            move(_y, _x);
+            move(_y, _x * 2);
             if (has_colors && get_tile(_x, _y) == '+')
             {
-                if (_x == 0 || _y == 0 || _x == COLS - 1 || _y == LINES - 1)
+                if (_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1)
+                {
+                }
+                else
+                {
+                    attron(COLOR_PAIR(COL_BLACK));
+                    addch(' ');
+                    attroff(COLOR_PAIR(COL_BLACK));
+                }
+            }
+            else if (has_colors && get_tile(_x, _y) == ' ')
+            {
+                attron(COLOR_PAIR(COL_GREY));
+                addch(ACS_CKBOARD);
+                attroff(COLOR_PAIR(COL_GREY));
+            }
+            else
+            {
+                addch(get_tile(_x, _y));
+            }
+            move(_y, _x * 2 + 1);
+            if (has_colors && get_tile(_x, _y) == '+')
+            {
+                if (_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1)
                 {
                 }
                 else
@@ -109,13 +133,13 @@ void draw_map()
     {
         pos.x = 0;
     }
-    if (pos.y >= LINES)
+    if (pos.y >= _LINES)
     {
-        pos.y = LINES - 1;
+        pos.y = _LINES - 1;
     }
-    if (pos.x >= COLS)
+    if (pos.x >= _COLS)
     {
-        pos.x = COLS - 1;
+        pos.x = _COLS - 1;
     }
     attron(COLOR_PAIR(COL_RED_BLACK));
     move(0, 0);
@@ -128,27 +152,27 @@ void draw_map()
     move(0, COLS - 1);
     vline(ACS_VLINE, LINES - 1);
     addch(ACS_URCORNER);
-    move(LINES - 1, COLS - 1);
+    move(LINES - 1, _COLS - 1);
     addch(ACS_LRCORNER);
     attroff(COLOR_PAIR(COL_RED_BLACK));
     if (!GENERATING)
     {
-        move(pos.y, pos.x);
+        move(pos.y, pos.x * 2);
         if (has_colors)
         {
             attron(COLOR_PAIR(COL_RED));
-            addch('O');
+            printw("  ");
             attroff(COLOR_PAIR(COL_RED));
         }
         else
         {
             addch('O');
         }
-        move(end_point.y, end_point.x);
+        move(end_point.y, end_point.x * 2);
         if (has_colors)
         {
             attron(COLOR_PAIR(COL_GREEN));
-            addch('O');
+            printw("  ");
             attroff(COLOR_PAIR(COL_GREEN));
         }
         else
@@ -181,7 +205,7 @@ void draw_map()
 }
 int is_on_map(struct position p)
 {
-    if (p.x >= 0 && p.x < COLS && p.y >= 0 && p.y < LINES)
+    if (p.x >= 0 && p.x < _COLS && p.y >= 0 && p.y < _LINES)
     {
         return 1;
     }
@@ -191,7 +215,7 @@ int is_on_map(struct position p)
 void set_tile(int _x, int _y, char _c)
 {
     struct position p = {_x, _y};
-    map[_y * COLS + _x] = _c;
+    map[_y * _COLS + _x] = _c;
 }
 struct neighbor get_neighboors(struct position p)
 {
@@ -425,23 +449,21 @@ void _generate(struct position point)
         }
     }
 }
-struct position find_random_path()
+void find_random_path(struct position * p)
 {
-    struct position p;
     do
     {
 
-        p.x = random_between(0, COLS - 2) + 1;
-        p.y = random_between(0, LINES - 2) + 1;
-    } while (get_tile(p.x, p.y) == '+');
-    return p;
+        p->x = random_between(0, _COLS - 2) + 1;
+        p->y = random_between(0, _LINES - 2) + 1;
+    } while (get_tile(p->x, p->y) == '+');
 }
 
 void generate()
 {
     struct position point;
-    point.x = random_between(1, COLS / 2 - 1) * 2;
-    point.y = random_between(1, LINES / 2 - 1) * 2 + 1;
+    point.x = random_between(1, _COLS / 2 - 1) * 2;
+    point.y = random_between(1, _LINES / 2 - 1) * 2 + 1;
     _generate(point);
 }
 
@@ -491,7 +513,8 @@ int main(int argc, char *argv[])
     }
 
     initscr();
-    mWINDOW = newwin(LINES, COLS, 0, 0);
+    _COLS = COLS / 2;
+    _LINES = LINES;
     curs_set(0);
     if (has_colors)
     {
@@ -508,15 +531,15 @@ int main(int argc, char *argv[])
     }
     srand(time(NULL));
 
-    map = malloc(((LINES * COLS)) * sizeof(char));
+    map = malloc(((_LINES * _COLS)) * sizeof(char));
 begin:
     GENERATING = 1;
-    memset(map, '+', LINES * COLS);
+    memset(map, '+', _LINES * _COLS);
     generate();
-    pos = find_random_path();
+    find_random_path(&pos);
     prev_pos.x = pos.x;
     prev_pos.y = pos.y;
-    end_point = find_random_path();
+    find_random_path(&end_point);
     GENERATING = 0;
 
     while (RUNNING)
