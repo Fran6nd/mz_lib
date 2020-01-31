@@ -5,10 +5,10 @@
 #include <unistd.h>
 #include <time.h>
 
-int running = 1;
-int error = 0;
-int generating = 1;
-int generate_delay = 1000;
+int RUNNING = 1;
+int ERROR = 0;
+int GENERATING = 1;
+int GENERATE_DELAY = 1000;
 
 int random_between(int min, int max)
 {
@@ -104,7 +104,7 @@ void draw_map()
     {
         pos.x = COLS - 1;
     }
-    if (!generating)
+    if (!GENERATING)
     {
         move(pos.y, pos.x);
         if (has_colors)
@@ -368,14 +368,14 @@ void _generate(struct position point)
     {
         set_tile(point.x, point.y, ' ');
         struct neighbor nb = get_pathables(point);
-        if (generate_delay)
+        if (GENERATE_DELAY)
         {
             draw_map();
             refresh();
         }
 
         /* Want it faster? Remove the following line :) */
-        usleep(generate_delay);
+        usleep(GENERATE_DELAY);
 
         int i;
         if (nb.n)
@@ -436,9 +436,9 @@ int main(int argc, char *argv[])
             printf("./MazeCurses --nodelay to set the maze's geneartion as fast as possible.\n");
             return 0;
         }
-        else if (strcmp(argv[1], "-nodelay") == 0)
+        else if (strcmp(argv[1], "--nodelay") == 0)
         {
-            generate_delay = 0;
+            GENERATE_DELAY = 0;
         }
         else
         {
@@ -450,14 +450,16 @@ int main(int argc, char *argv[])
     {
         if (strcmp(argv[1], "--delay") == 0)
         {
-            generate_delay = atoi(argv[2]);
+            GENERATE_DELAY = atoi(argv[2]);
         }
-        else{
+        else
+        {
             printf("Unknown arg \"%s\" see -h for help.\n", argv[1]);
             return 0;
         }
     }
-    else if(argc>3){
+    else if (argc > 3)
+    {
         printf("Too many args... see -h for help.\n");
         return 0;
     }
@@ -482,16 +484,16 @@ int main(int argc, char *argv[])
 
     map = malloc(((LINES * COLS)) * sizeof(char));
 begin:
-    generating = 1;
+    GENERATING = 1;
     memset(map, '+', LINES * COLS);
     generate();
     pos = find_random_path();
     prev_pos.x = pos.x;
     prev_pos.y = pos.y;
     end_point = find_random_path();
-    generating = 0;
+    GENERATING = 0;
 
-    while (running)
+    while (RUNNING)
     {
         prev_pos.x = pos.x;
         prev_pos.y = pos.y;
@@ -530,14 +532,14 @@ begin:
         }
         if (pos.x == end_point.x && pos.y == end_point.y)
         {
-            running = 0;
+            RUNNING = 0;
         }
     }
-    running = 1;
+    RUNNING = 1;
     goto begin;
 quit:
     free(map);
     endwin();
 
-    return error;
+    return ERROR;
 }
