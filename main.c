@@ -5,11 +5,15 @@
 #include <unistd.h>
 #include <time.h>
 
+/* Defining all collors used. */
+
 #define COL_RED 1
 #define COL_GREEN 2
 #define COL_GREY 3
 #define COL_BLACK 4
 #define COL_RED_BLACK 5
+
+/* Here are globals. */
 
 int RUNNING = 1;
 int ERROR = 0;
@@ -263,7 +267,10 @@ struct neighbor get_advanced_neighboors(struct position p)
     right.x = p.x + 1;
     left.y = p.y;
     left.x = p.x - 1;
-    struct position up_right = {p.x + 1, p.y - 1}, down_right = {p.x + 1, p.y + 1}, down_left = {p.x - 1, p.y + 1}, up_left = {p.x - 1, p.y - 1};
+    struct position up_right = {p.x + 1, p.y - 1},
+		    down_right = {p.x + 1, p.y + 1},
+		    down_left = {p.x - 1, p.y + 1},
+		    up_left = {p.x - 1, p.y - 1};
 
     struct neighbor nb;
     nb.n = 0;
@@ -457,8 +464,10 @@ int main(int argc, char *argv[])
             printf("Usage:\n");
             printf("./MazeCurses\n");
             printf("./MazeCurses -h to display help.\n");
-            printf("./MazeCurses --delay [int] to set the maze's generation's delay (us).\n");
-            printf("./MazeCurses --nodelay to set the maze's geneartion as fast as possible.\n");
+            printf("./MazeCurses --delay [int] to set the maze's generation's "
+			    "delay (us).\n");
+            printf("./MazeCurses --nodelay to set the maze's geneartion as"
+			    " fast as possible.\n");
             return 0;
         }
         else if (strcmp(argv[1], "--nodelay") == 0)
