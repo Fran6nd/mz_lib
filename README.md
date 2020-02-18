@@ -13,5 +13,5 @@ On debian distros, use the following command to install the lib:<br>
 <br>
 Then:<br>
 Run `make mz_curses` to build the demo program.<br>
-Run `./mz_curses -h` to see help.<br>
+Run `./dist/mz_curses -h` to see help.<br>
 

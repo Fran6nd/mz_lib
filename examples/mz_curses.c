@@ -117,7 +117,7 @@ void draw_map()
     move(LINES - 1, COLS - 1);
     addch(ACS_LRCORNER);
     attroff(COLOR_PAIR(COL_RED_BLACK));
-    //if (!GENERATING)
+    if (!GENERATING)
     {
         move(pos.y, pos.x * 2);
         if (has_colors)
@@ -166,6 +166,16 @@ void draw_map()
     }
 }
 
+void during_generation(mz_maze *maze)
+{
+    if (GENERATE_DELAY > 0)
+    {
+        draw_map();
+        usleep(GENERATE_DELAY);
+        refresh();
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc == 2)
@@ -180,9 +190,9 @@ int main(int argc, char *argv[])
             printf("./MazeCurses\n");
             printf("./MazeCurses -h to display help.\n");
             printf("./MazeCurses --delay [int] to set the maze's generation's "
-			    "delay (us).\n");
+                   "delay (us).\n");
             printf("./MazeCurses --nodelay to set the maze's geneartion as"
-			    " fast as possible.\n");
+                   " fast as possible.\n");
             return 0;
         }
         else if (strcmp(argv[1], "--nodelay") == 0)
@@ -232,9 +242,11 @@ int main(int argc, char *argv[])
     }
     srand(time(NULL));
 
-    mz_new(&maze, _COLS, _LINES);
 begin:
-    mz_generate(&maze, NULL);
+    mz_new(&maze, _COLS, _LINES);
+    GENERATING = 1;
+    mz_generate(&maze, &during_generation);
+    GENERATING = 0;
     pos = maze.start_pos;
     end_point = maze.end_pos;
     prev_pos.x = pos.x;
@@ -283,6 +295,7 @@ begin:
         }
     }
     RUNNING = 1;
+    mz_free(&maze);
     goto begin;
 quit:
     mz_free(&maze);

@@ -1,4 +1,4 @@
 .vscode
-MazeCurses
-mz_lib.so
-mz_curses
+dist/*
+core/src/*.o
+examples/*.o

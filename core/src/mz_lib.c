@@ -276,9 +276,6 @@ void _generate(mz_maze *maze_ptr, mz_position point,
             callback(maze_ptr);
         }
 
-        /* Want it faster? Remove the following line :) */
-        //usleep(GENERATE_DELAY);
-
         int i;
         if (nb.n)
         {
@@ -318,7 +315,7 @@ void mz_generate(mz_maze *maze_ptr, void (*callback)(mz_maze *maze_ptr))
     point.x = random_between(1, maze_ptr->x - 2);
     point.y = random_between(1, maze_ptr->y - 2);
     }
-    while(!can_path_h(&point) && !can_path_v(&point));
+    while(!can_path_h(&point) || !can_path_v(&point));
     _generate(maze_ptr, point, callback);
     find_random_path(maze_ptr, &maze_ptr->end_pos);
     find_random_path(maze_ptr, &maze_ptr->start_pos);
