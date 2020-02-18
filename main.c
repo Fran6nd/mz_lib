@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "mz_lib.h"
+
 /* Defining all collors used. */
 
 #define COL_RED 1
@@ -22,56 +24,11 @@ int GENERATE_DELAY = 1000;
 int _LINES;
 int _COLS;
 
-int random_between(int min, int max)
-{
-    return rand() % ((max + 1) - min) + min;
-}
+mz_position pos = {4, 3};
+mz_position prev_pos = {4, 3};
+mz_position end_point;
 
-struct position
-{
-    int x;
-    int y;
-};
-struct neighbor
-{
-    int n;
-    struct position paths[8];
-};
-struct position pos = {4, 3};
-struct position prev_pos = {4, 3};
-struct position end_point;
-
-char *map;
-char get_tile(int _x, int _y)
-{
-    return map[_y * _COLS + _x];
-}
-
-int is_odd(int n)
-{
-    if (n % 2 == 0)
-    {
-        return 1;
-    }
-    return 0;
-}
-
-int can_move_v(struct position *p)
-{
-    if (is_odd(p->x))
-    {
-        return 1;
-    }
-    return 0;
-}
-int can_move_h(struct position *p)
-{
-    if (is_odd(p->y))
-    {
-        return 0;
-    }
-    return 1;
-}
+mz_maze maze;
 
 void draw_map()
 {
@@ -82,7 +39,8 @@ void draw_map()
         for (_x = 0; _x < _COLS; _x++)
         {
             move(_y, _x * 2);
-            if (has_colors && get_tile(_x, _y) == '+')
+            mz_position p1 = {_x, _y};
+            if (has_colors && mz_get_tile(&maze, p1) == MZ_WALL)
             {
                 if (_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1)
                 {
@@ -94,7 +52,7 @@ void draw_map()
                     attroff(COLOR_PAIR(COL_BLACK));
                 }
             }
-            else if (has_colors && get_tile(_x, _y) == ' ')
+            else if (has_colors && mz_get_tile(&maze, p1) == MZ_PATH)
             {
                 attron(COLOR_PAIR(COL_GREY));
                 addch(ACS_CKBOARD);
@@ -102,10 +60,10 @@ void draw_map()
             }
             else
             {
-                addch(get_tile(_x, _y));
+                addch(mz_get_tile(&maze, p1));
             }
             move(_y, _x * 2 + 1);
-            if (has_colors && get_tile(_x, _y) == '+')
+            if (has_colors && mz_get_tile(&maze, p1) == MZ_WALL)
             {
                 if (_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1)
                 {
@@ -117,7 +75,7 @@ void draw_map()
                     attroff(COLOR_PAIR(COL_BLACK));
                 }
             }
-            else if (has_colors && get_tile(_x, _y) == ' ')
+            else if (has_colors && mz_get_tile(&maze, p1) == MZ_PATH)
             {
                 attron(COLOR_PAIR(COL_GREY));
                 addch(ACS_CKBOARD);
@@ -125,7 +83,7 @@ void draw_map()
             }
             else
             {
-                addch(get_tile(_x, _y));
+                addch(mz_get_tile(&maze, p1));
             }
         }
     }
@@ -159,7 +117,7 @@ void draw_map()
     move(LINES - 1, COLS - 1);
     addch(ACS_LRCORNER);
     attroff(COLOR_PAIR(COL_RED_BLACK));
-    if (!GENERATING)
+    //if (!GENERATING)
     {
         move(pos.y, pos.x * 2);
         if (has_colors)
@@ -206,249 +164,6 @@ void draw_map()
     {
         printw("Press [q] to exit.");
     }
-}
-int is_on_map(struct position p)
-{
-    if (p.x >= 0 && p.x < _COLS && p.y >= 0 && p.y < _LINES)
-    {
-        return 1;
-    }
-    return 0;
-}
-
-void set_tile(int _x, int _y, char _c)
-{
-    struct position p = {_x, _y};
-    map[_y * _COLS + _x] = _c;
-}
-struct neighbor get_neighboors(struct position p)
-{
-    struct position up, down, right, left;
-    up.x = p.x;
-    up.y = p.y - 1;
-    down.x = p.x;
-    down.y = p.y + 1;
-    right.y = p.y;
-    right.x = p.x + 1;
-    left.y = p.y;
-    left.x = p.x - 1;
-    struct neighbor nb;
-    nb.n = 0;
-    if (is_on_map(up))
-    {
-        nb.paths[nb.n] = up;
-        nb.n++;
-    }
-    if (is_on_map(down))
-    {
-        nb.paths[nb.n] = down;
-        nb.n++;
-    }
-    if (is_on_map(right))
-    {
-        nb.paths[nb.n] = right;
-        nb.n++;
-    }
-    if (is_on_map(left))
-    {
-        nb.paths[nb.n] = left;
-        nb.n++;
-    }
-    return nb;
-}
-struct neighbor get_advanced_neighboors(struct position p)
-{
-    struct position up, down, right, left;
-    up.x = p.x;
-    up.y = p.y - 1;
-    down.x = p.x;
-    down.y = p.y + 1;
-    right.y = p.y;
-    right.x = p.x + 1;
-    left.y = p.y;
-    left.x = p.x - 1;
-    struct position up_right = {p.x + 1, p.y - 1},
-		    down_right = {p.x + 1, p.y + 1},
-		    down_left = {p.x - 1, p.y + 1},
-		    up_left = {p.x - 1, p.y - 1};
-
-    struct neighbor nb;
-    nb.n = 0;
-    if (is_on_map(up))
-    {
-        nb.paths[nb.n] = up;
-        nb.n++;
-    }
-    if (is_on_map(down))
-    {
-        nb.paths[nb.n] = down;
-        nb.n++;
-    }
-    if (is_on_map(right))
-    {
-        nb.paths[nb.n] = right;
-        nb.n++;
-    }
-    if (is_on_map(left))
-    {
-        nb.paths[nb.n] = left;
-        nb.n++;
-    }
-    if (is_on_map(up_left))
-    {
-        nb.paths[nb.n] = up_left;
-        nb.n++;
-    }
-    if (is_on_map(up_right))
-    {
-        nb.paths[nb.n] = up_right;
-        nb.n++;
-    }
-    if (is_on_map(down_left))
-    {
-        nb.paths[nb.n] = down_left;
-        nb.n++;
-    }
-    if (is_on_map(down_right))
-    {
-        nb.paths[nb.n] = down_right;
-        nb.n++;
-    }
-    return nb;
-}
-
-int is_pathable(struct position p)
-{
-    if (is_on_map(p))
-    {
-        if (get_tile(p.x, p.y) == '+')
-        {
-            struct neighbor nb1 = get_neighboors(p);
-            if (nb1.n == 4)
-            {
-                int i;
-                int j = 0;
-                for (i = 0; i < nb1.n; i++)
-                {
-                    if (get_tile(nb1.paths[i].x, nb1.paths[i].y) == ' ')
-                    {
-                        j++;
-                    }
-                }
-                if (j <= 1)
-                {
-                    struct neighbor nb = get_advanced_neighboors(p);
-                    if (nb.n == 8)
-                    {
-                        i = 0;
-                        j = 0;
-                        for (i = 0; i < nb.n; i++)
-                        {
-                            if (get_tile(nb.paths[i].x, nb.paths[i].y) == ' ')
-                            {
-                                j++;
-                            }
-                        }
-                        if (j <= 3)
-                        {
-                            return 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return 0;
-}
-struct neighbor get_pathables(struct position p)
-{
-    struct position up, down, right, left;
-    up.x = p.x;
-    up.y = p.y - 1;
-    down.x = p.x;
-    down.y = p.y + 1;
-    right.y = p.y;
-    right.x = p.x + 1;
-    left.y = p.y;
-    left.x = p.x - 1;
-    struct neighbor nb;
-    nb.n = 0;
-    if (is_pathable(up) && can_move_v(&p))
-    {
-        nb.paths[nb.n] = up;
-        nb.n++;
-    }
-    if (is_pathable(down) && can_move_v(&p))
-    {
-        nb.paths[nb.n] = down;
-        nb.n++;
-    }
-    if (is_pathable(right) && can_move_h(&p))
-    {
-        nb.paths[nb.n] = right;
-        nb.n++;
-    }
-    if (is_pathable(left) && can_move_h(&p))
-    {
-        nb.paths[nb.n] = left;
-        nb.n++;
-    }
-    return nb;
-}
-
-void _generate(struct position point)
-{
-    if (is_pathable(point))
-    {
-        set_tile(point.x, point.y, ' ');
-        struct neighbor nb = get_pathables(point);
-        if (GENERATE_DELAY)
-        {
-            draw_map();
-            refresh();
-        }
-
-        /* Want it faster? Remove the following line :) */
-        usleep(GENERATE_DELAY);
-
-        int i;
-        if (nb.n)
-        {
-            if (random_between(0, 1) == 1)
-            {
-                for (i = 0; i < nb.n; i++)
-                {
-
-                    _generate(nb.paths[i]);
-                }
-            }
-            else
-            {
-                for (i = nb.n - 1; i >= 0; i--)
-                {
-
-                    _generate(nb.paths[i]);
-                }
-            }
-        }
-    }
-}
-void find_random_path(struct position *p)
-{
-    do
-    {
-
-        p->x = random_between(0, _COLS - 2) + 1;
-        p->y = random_between(0, _LINES - 2) + 1;
-    } while (get_tile(p->x, p->y) == '+');
-}
-
-void generate()
-{
-    struct position point;
-    point.x = random_between(1, _COLS / 2 - 1) * 2;
-    point.y = random_between(1, _LINES / 2 - 1) * 2 + 1;
-    _generate(point);
 }
 
 int main(int argc, char *argv[])
@@ -517,16 +232,13 @@ int main(int argc, char *argv[])
     }
     srand(time(NULL));
 
-    map = malloc(((_LINES * _COLS)) * sizeof(char));
+    mz_new(&maze, _COLS, _LINES);
 begin:
-    GENERATING = 1;
-    memset(map, '+', _LINES * _COLS);
-    generate();
-    find_random_path(&pos);
+    mz_generate(&maze, NULL);
+    pos = maze.start_pos;
+    end_point = maze.end_pos;
     prev_pos.x = pos.x;
     prev_pos.y = pos.y;
-    find_random_path(&end_point);
-    GENERATING = 0;
 
     while (RUNNING)
     {
@@ -560,7 +272,7 @@ begin:
         {
             goto quit;
         }
-        if (get_tile(pos.x, pos.y) != ' ')
+        if (mz_get_tile(&maze, pos) != MZ_PATH)
         {
             pos.x = prev_pos.x;
             pos.y = prev_pos.y;
@@ -573,7 +285,7 @@ begin:
     RUNNING = 1;
     goto begin;
 quit:
-    free(map);
+    mz_free(&maze);
     endwin();
 
     return ERROR;

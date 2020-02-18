@@ -12,5 +12,6 @@ On debian distros, use the following command to install the lib:<br>
 `sudo apt-get install libncurses5-dev libncursesw5-dev`<br>
 <br>
 Then:<br>
-Run `./MazeCurses -h` to see help.<br>
-Run `./build.sh` to build the program.<br>
+Run `make mz_curses` to build the demo program.<br>
+Run `./mz_curses -h` to see help.<br>
+

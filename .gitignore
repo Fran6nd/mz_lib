@@ -1,2 +1,4 @@
 .vscode
 MazeCurses
+mz_lib.so
+mz_curses
