@@ -1,6 +1,10 @@
-# MazeCurses
-A simple maze game in terminal, written in C and featuring a generator.<br>
+# mz_lib
+A simple maze generation (and, in the futur, resolution) library written in C.<br>
 I made this project for the challenge of implementing an algo I did in Java and Js.<br>
+I'm working on python, js and C# binding...
+
+# mz_curses
+A simple maze game in terminal, written in C.<br>
 It's using the size available in the terminal.<br>
 It's really the fastes I did for now!<br>
 I'm open for any continution to improve it.<br>
