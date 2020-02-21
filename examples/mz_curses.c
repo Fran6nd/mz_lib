@@ -146,12 +146,12 @@ void draw_map()
     if (has_colors)
     {
         attron(COLOR_PAIR(5));
-        printw("MazeCurses by Fran6nd.");
+        printw("mz_curses by Fran6nd.");
         attroff(COLOR_PAIR(5));
     }
     else
     {
-        printw("MazeCurses by Fran6nd.");
+        printw("mz_curses by Fran6nd.");
     }
     move(LINES - 1, COLS - 20);
     if (has_colors)
@@ -183,15 +183,15 @@ int main(int argc, char *argv[])
         if (strcmp(argv[1], "-h") == 0)
         {
             printf("------------------------------------------\n");
-            printf("MazeCurses, a maze game made with ncurses.\n");
+            printf("mz_curses, a maze game made with ncurses.\n");
             printf("------------------------------------------\n");
             printf("by Fran6nd\n\n");
             printf("Usage:\n");
-            printf("./MazeCurses\n");
-            printf("./MazeCurses -h to display help.\n");
-            printf("./MazeCurses --delay [int] to set the maze's generation's "
+            printf("./mz_curses\n");
+            printf("./mz_curses -h to display help.\n");
+            printf("./mz_curses --delay [int] to set the maze's generation's "
                    "delay (us).\n");
-            printf("./MazeCurses --nodelay to set the maze's geneartion as"
+            printf("./mz_curses --nodelay to set the maze's geneartion as"
                    " fast as possible.\n");
             return 0;
         }
