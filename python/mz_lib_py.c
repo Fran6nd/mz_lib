@@ -1,32 +1,63 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-static PyObject *method_fputs(PyObject *self, PyObject *args) {
+#include "mz_lib.h"
 
-    char *str, *filename = NULL;
+static pyobject *method_fputs(pyobject *self, pyobject *args) {
+
+    char *str, *filename = null;
 
     int bytes_copied = -1;
 
 
-    /* Parse arguments */
+    /* parse arguments */
 
-    if(!PyArg_ParseTuple(args, "ss", &str, &filename)) {
+    if(!pyarg_parsetuple(args, "ss", &str, &filename)) {
 
-        return NULL;
+        return null;
 
     }
 
 
-    FILE *fp = fopen(filename, "w");
+    file *fp = fopen(filename, "w");
 
     bytes_copied = fputs(str, fp);
 
     fclose(fp);
 
 
-    return PyLong_FromLong(bytes_copied);
+    return pylong_fromlong(bytes_copied);
 
 }
+
+static pyobject *method_mz_new(pyobject *self, pyobject *args) {
+
+    char *str, *filename = null;
+
+    int bytes_copied = -1;
+
+
+    /* parse arguments */
+
+    if(!pyarg_parsetuple(args, "ss", &str, &filename)) {
+
+        return null;
+
+    }
+
+
+    file *fp = fopen(filename, "w");
+
+    bytes_copied = fputs(str, fp);
+
+    fclose(fp);
+
+
+    return pylong_fromlong(bytes_copied);
+
+}
+
+
 
 static PyMethodDef FputsMethods[] = {
     {"fputs", method_fputs, METH_VARARGS, "Python interface for fputs C library function"},
