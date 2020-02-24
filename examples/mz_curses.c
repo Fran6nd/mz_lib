@@ -40,19 +40,16 @@ void draw_map()
         {
             move(_y, _x * 2);
             mz_position p1 = {_x, _y};
-            if (has_colors && mz_get_tile(&maze, p1) == MZ_WALL)
+            if (has_colors() && mz_get_tile(&maze, p1) == MZ_WALL)
             {
-                if (_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1)
-                {
-                }
-                else
+                if (!(_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1))
                 {
                     attron(COLOR_PAIR(COL_BLACK));
                     addch(' ');
                     attroff(COLOR_PAIR(COL_BLACK));
                 }
             }
-            else if (has_colors && mz_get_tile(&maze, p1) == MZ_PATH)
+            else if (has_colors() && mz_get_tile(&maze, p1) == MZ_PATH)
             {
                 attron(COLOR_PAIR(COL_GREY));
                 addch(ACS_CKBOARD);
@@ -63,7 +60,7 @@ void draw_map()
                 addch(mz_get_tile(&maze, p1));
             }
             move(_y, _x * 2 + 1);
-            if (has_colors && mz_get_tile(&maze, p1) == MZ_WALL)
+            if (has_colors() && mz_get_tile(&maze, p1) == MZ_WALL)
             {
                 if (_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1)
                 {
@@ -75,7 +72,7 @@ void draw_map()
                     attroff(COLOR_PAIR(COL_BLACK));
                 }
             }
-            else if (has_colors && mz_get_tile(&maze, p1) == MZ_PATH)
+            else if (has_colors() && mz_get_tile(&maze, p1) == MZ_PATH)
             {
                 attron(COLOR_PAIR(COL_GREY));
                 addch(ACS_CKBOARD);
@@ -120,7 +117,7 @@ void draw_map()
     if (!GENERATING)
     {
         move(pos.y, pos.x * 2);
-        if (has_colors)
+        if (has_colors())
         {
             attron(COLOR_PAIR(COL_RED));
             printw("  ");
@@ -131,7 +128,7 @@ void draw_map()
             addch('O');
         }
         move(end_point.y, end_point.x * 2);
-        if (has_colors)
+        if (has_colors())
         {
             attron(COLOR_PAIR(COL_GREEN));
             printw("  ");
@@ -143,7 +140,7 @@ void draw_map()
         }
     }
     move(0, 5);
-    if (has_colors)
+    if (has_colors())
     {
         attron(COLOR_PAIR(5));
         printw("mz_curses by Fran6nd.");
@@ -154,7 +151,7 @@ void draw_map()
         printw("mz_curses by Fran6nd.");
     }
     move(LINES - 1, COLS - 20);
-    if (has_colors)
+    if (has_colors())
     {
         attron(COLOR_PAIR(5));
         printw("Press [q] to exit.");
@@ -227,7 +224,7 @@ int main(int argc, char *argv[])
     _COLS = COLS / 2;
     _LINES = LINES;
     curs_set(0);
-    if (has_colors)
+    if (has_colors())
     {
         start_color();
         init_pair(COL_RED, COLOR_RED, COLOR_RED);
