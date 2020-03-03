@@ -42,10 +42,7 @@ void draw_map()
             mz_position p1 = {_x, _y};
             if (has_colors && mz_get_tile(&maze, p1) == MZ_WALL)
             {
-                if (_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1)
-                {
-                }
-                else
+                if (!(_x == 0 || _y == 0 || _x == _COLS - 1 || _y == _LINES - 1))
                 {
                     attron(COLOR_PAIR(COL_BLACK));
                     addch(' ');
