@@ -2,3 +2,4 @@
 dist/*
 core/src/*.o
 examples/*.o
+*.o

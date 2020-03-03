@@ -224,6 +224,7 @@ int main(int argc, char *argv[])
     _COLS = COLS / 2;
     _LINES = LINES;
     curs_set(0);
+    noecho();
     if (has_colors)
     {
         start_color();
