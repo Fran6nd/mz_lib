@@ -3,6 +3,7 @@
 
 #define MZ_WALL '#'
 #define MZ_PATH ' '
+#define MZ_ANSWER '0'
 
 typedef struct Maze mz_maze;
 

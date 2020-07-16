@@ -7,13 +7,15 @@ EXAMPLES = examples
 
 mz_lib.o: $(LIB_SRC)/mz_lib.c
 	[ -d $(DIST) ] || mkdir -p $(DIST)
-	gcc -O -c $(LIB_SRC)/mz_lib.c -std=c99 -o mz_lib.o -I$(LIB_INC)
+	gcc -O -c $(LIB_SRC)/mz_lib.c  -std=c99 -o mz_lib.o -I$(LIB_INC)
+position_list.o:
+	gcc -O -c $(LIB_SRC)/position_list.c  -std=c99 -o position_list.o -I$(LIB_INC)
 mz_lib.a: mz_lib.o
 	ar rcs $(DIST)/mz_lib.a $(LIB_SRC)/mz_lib.o
 mz_curses.o:  mz_lib.o $(EXAMPLES)/mz_curses.c
 	gcc -D _DEFAULT_SOURCE -O -c $(EXAMPLES)/mz_curses.c -std=c99 -o mz_curses.o -I$(LIB_INC)
-mz_curses: mz_curses.o mz_lib.o
-	gcc mz_curses.o mz_lib.o -I$(LIB_INC) -lncurses -o $(DIST)/mz_curses
+mz_curses: mz_curses.o mz_lib.o position_list.o
+	gcc mz_curses.o mz_lib.o position_list.o -I$(LIB_INC) -lncurses -o $(DIST)/mz_curses
 all: mz_curses mz_lib.a 
 clean:
 	rm $(DIST)/*
