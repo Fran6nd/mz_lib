@@ -3,6 +3,7 @@
 
 #define MZ_WALL '#'
 #define MZ_PATH ' '
+#define MZ_SOLUTION '0'
 
 typedef struct Maze mz_maze;
 
@@ -32,7 +33,7 @@ struct Neighbor
 };
 
 
-int mz_new(mz_maze* maze_ptr, int x, int y);
+mz_maze* mz_new(int x, int y);
 int mz_free(mz_maze* maze_ptr);
 void mz_generate(mz_maze* maze_ptr, void (*callback)(mz_maze* maze_ptr));
 char mz_get_tile(mz_maze* maze_ptr, mz_position pos);
