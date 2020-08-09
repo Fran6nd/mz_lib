@@ -204,6 +204,7 @@ mz_maze *mz_new(int x, int y) {
 
 int mz_free(mz_maze *maze_ptr) {
   free(maze_ptr->grid);
+  free(maze_ptr);
   return 1;
 }
 
