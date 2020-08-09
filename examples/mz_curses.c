@@ -47,6 +47,11 @@ void draw_map() {
         attron(COLOR_PAIR(COL_GREY));
         addch(ACS_CKBOARD);
         attroff(COLOR_PAIR(COL_GREY));
+
+      } else if (has_colors && mz_get_tile(maze, p1) == MZ_SOLUTION) {
+        attron(COLOR_PAIR(COL_RED_BLACK));
+        addch(ACS_CKBOARD);
+        attroff(COLOR_PAIR(COL_RED_BLACK));
       } else {
         addch(mz_get_tile(maze, p1));
       }
@@ -223,6 +228,8 @@ begin:
       }
     } else if (c == 'q') {
       goto quit;
+    } else if (c == 's') {
+      mz_solve(maze, NULL);
     }
     if (mz_get_tile(maze, pos) != MZ_PATH) {
       pos.x = prev_pos.x;

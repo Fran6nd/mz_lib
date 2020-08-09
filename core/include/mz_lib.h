@@ -36,6 +36,7 @@ struct Neighbor
 mz_maze* mz_new(int x, int y);
 int mz_free(mz_maze* maze_ptr);
 void mz_generate(mz_maze* maze_ptr, void (*callback)(mz_maze* maze_ptr));
+void mz_solve(mz_maze* maze_ptr, void (*callback)(mz_maze* maze_ptr));
 char mz_get_tile(mz_maze* maze_ptr, mz_position pos);
 void mz_set_tile(mz_maze* maze_ptr, mz_position pos, char tile);
 void mz_iterate(mz_maze* maze_ptr, void (*callback)(mz_maze* maze_ptr,

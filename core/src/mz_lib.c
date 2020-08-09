@@ -263,3 +263,31 @@ void mz_generate(mz_maze *maze_ptr, void (*callback)(mz_maze *maze_ptr)) {
   find_random_path(maze_ptr, &maze_ptr->end_pos);
   find_random_path(maze_ptr, &maze_ptr->start_pos);
 }
+
+int solve(mz_maze *maze_ptr, mz_position prev_pos, mz_position pos,
+          void (*callback)(mz_maze *maze_ptr)) {
+  mz_neighbor neighbor = mz_get_neighboors(maze_ptr, pos);
+  int i;
+  for (i = 0; i < neighbor.n; i++) {
+    if (mz_get_tile(maze_ptr, neighbor.paths[i]) == MZ_PATH) {
+      if (neighbor.paths[i].x != prev_pos.x ||
+          neighbor.paths[i].y != prev_pos.y) {
+        if (neighbor.paths[i].x == maze_ptr->end_pos.x &&
+            neighbor.paths[i].y == maze_ptr->end_pos.y) {
+          mz_set_tile(maze_ptr, pos, MZ_SOLUTION);
+          return 1;
+        } else {
+          if (solve(maze_ptr, pos, neighbor.paths[i], NULL) == 1) {
+            mz_set_tile(maze_ptr, pos, MZ_SOLUTION);
+            return 1;
+          }
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+void mz_solve(mz_maze *maze_ptr, void (*callback)(mz_maze *maze_ptr)) {
+  solve(maze_ptr, maze_ptr->start_pos, maze_ptr->start_pos, NULL);
+}
