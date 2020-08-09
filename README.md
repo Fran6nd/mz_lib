@@ -1,5 +1,5 @@
 # mz_lib
-A simple maze generation (and, in the futur, resolution) library written in C.<br>
+A simple maze generation and resolution library written in C.<br>
 I made this project for the challenge of implementing an algo I did in Java and Js.<br>
 I'm working on python, js and C# binding...
 
