@@ -67,6 +67,10 @@ void draw_map() {
         attron(COLOR_PAIR(COL_GREY));
         addch(ACS_CKBOARD);
         attroff(COLOR_PAIR(COL_GREY));
+      } else if (has_colors && mz_get_tile(maze, p1) == MZ_SOLUTION) {
+        attron(COLOR_PAIR(COL_RED_BLACK));
+        addch(ACS_CKBOARD);
+        attroff(COLOR_PAIR(COL_RED_BLACK));
       } else {
         addch(mz_get_tile(maze, p1));
       }
@@ -124,13 +128,13 @@ void draw_map() {
   } else {
     printw("MazeCurses by Fran6nd.");
   }
-  move(LINES - 1, COLS - 20);
+  move(LINES - 1, COLS - 40);
   if (has_colors) {
     attron(COLOR_PAIR(5));
-    printw("Press [q] to exit.");
+    printw("Press [s] to solve and [q] to exit");
     attroff(COLOR_PAIR(5));
   } else {
-    printw("Press [q] to exit.");
+    printw("Press [s] to solve and [q] to exit.");
   }
 }
 
@@ -231,9 +235,11 @@ begin:
     } else if (c == 's') {
       mz_solve(maze, NULL);
     }
-    if (mz_get_tile(maze, pos) != MZ_PATH) {
+    if (mz_get_tile(maze, pos) == MZ_WALL) {
       pos.x = prev_pos.x;
       pos.y = prev_pos.y;
+    } else {
+      maze->start_pos = pos;
     }
     if (pos.x == end_point.x && pos.y == end_point.y) {
       RUNNING = 0;

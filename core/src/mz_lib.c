@@ -288,6 +288,13 @@ int solve(mz_maze *maze_ptr, mz_position prev_pos, mz_position pos,
   return 0;
 }
 
+void remove_solution(mz_maze * maze_ptr, mz_position pos){
+  if(mz_get_tile(maze_ptr, pos) == MZ_SOLUTION){
+    mz_set_tile(maze_ptr, pos, MZ_PATH);
+  }
+}
+
 void mz_solve(mz_maze *maze_ptr, void (*callback)(mz_maze *maze_ptr)) {
+  mz_iterate(maze_ptr, remove_solution);
   solve(maze_ptr, maze_ptr->start_pos, maze_ptr->start_pos, NULL);
 }
