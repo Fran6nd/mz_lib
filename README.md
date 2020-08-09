@@ -11,7 +11,7 @@ I'm open for any continution to improve it.<br>
 
 # How to use?
 
-You will need the lib `ncurses` to build the project.<br>
+You will need the lib `ncurses` to build the project's example.<br>
 On debian distros, use the following command to install the lib:<br>
 `sudo apt-get install libncurses5-dev libncursesw5-dev`<br>
 <br>
