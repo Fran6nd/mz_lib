@@ -24,7 +24,9 @@ int GENERATE_DELAY = 1000;
 int _LINES;
 int _COLS;
 
-mz_position pos = {4, 3};
+
+
+mz_position pos[3] = {{4, 3},{4, 3},{4, 3}};
 mz_position prev_pos = {4, 3};
 mz_position end_point;
 
@@ -76,17 +78,17 @@ void draw_map() {
       }
     }
   }
-  if (pos.y < 0) {
-    pos.y = 0;
+  if (pos[0].y < 0) {
+    pos[0].y = 0;
   }
-  if (pos.x < 0) {
-    pos.x = 0;
+  if (pos[0].x < 0) {
+    pos[0].x = 0;
   }
-  if (pos.y >= _LINES) {
-    pos.y = _LINES - 1;
+  if (pos[0].y >= _LINES) {
+    pos[0].y = _LINES - 1;
   }
-  if (pos.x >= _COLS) {
-    pos.x = _COLS - 1;
+  if (pos[0].x >= _COLS) {
+    pos[0].x = _COLS - 1;
   }
   attron(COLOR_PAIR(COL_RED_BLACK));
   move(0, 0);
@@ -103,14 +105,30 @@ void draw_map() {
   addch(ACS_LRCORNER);
   attroff(COLOR_PAIR(COL_RED_BLACK));
   if (!GENERATING) {
-    move(pos.y, pos.x * 2);
-    if (has_colors()) {
-      attron(COLOR_PAIR(COL_RED));
-      printw("  ");
-      attroff(COLOR_PAIR(COL_RED));
-    } else {
-      addch('O');
+    for(int i = 2; i >= 0; i--){
+      move(pos[i].y, pos[i].x * 2);
+      if (has_colors()) {
+        attron(COLOR_PAIR(COL_RED));
+        switch(i){
+          case 0:
+            addch(ACS_DIAMOND);
+            addch(ACS_DIAMOND);
+            break;
+          case 1:
+            addch(' ');
+            addch(' ');
+            break;
+          case 2:
+            addch(ACS_CKBOARD);
+            addch(ACS_CKBOARD);
+            break;
+        }
+        attroff(COLOR_PAIR(COL_RED));
+      } else {
+        addch('O');
+      }
     }
+
     move(end_point.y, end_point.x * 2);
     if (has_colors()) {
       attron(COLOR_PAIR(COL_GREEN));
@@ -186,7 +204,7 @@ int main(int argc, char *argv[]) {
   noecho();
   if (has_colors()) {
     start_color();
-    init_pair(COL_RED, COLOR_RED, COLOR_RED);
+    init_pair(COL_RED, COLOR_BLACK, COLOR_RED);
     init_pair(COL_GREEN, COLOR_GREEN, COLOR_GREEN);
     init_pair(COL_GREY, COLOR_BLACK, COLOR_WHITE);
     init_pair(COL_BLACK, COLOR_BLACK, COLOR_BLACK);
@@ -201,14 +219,16 @@ begin:
   GENERATING = 1;
   mz_generate(maze, &during_generation);
   GENERATING = 0;
-  pos = maze->start_pos;
+  pos[0] = maze->start_pos;
+  pos[1] = maze->start_pos;
+  pos[2] = maze->start_pos;
   end_point = maze->end_pos;
-  prev_pos.x = pos.x;
-  prev_pos.y = pos.y;
+  prev_pos.x = pos[0].x;
+  prev_pos.y = pos[0].y;
 
   while (RUNNING) {
-    prev_pos.x = pos.x;
-    prev_pos.y = pos.y;
+    prev_pos.x = pos[0].x;
+    prev_pos.y = pos[0].y;
 
     draw_map();
     doupdate();
@@ -218,16 +238,16 @@ begin:
       getch();
       switch (getch()) {
       case 'A':
-        pos.y--;
+        pos[0].y--;
         break;
       case 'B':
-        pos.y++;
+        pos[0].y++;
         break;
       case 'C':
-        pos.x++;
+        pos[0].x++;
         break;
       case 'D':
-        pos.x--;
+        pos[0].x--;
         break;
       }
     } else if (c == 'q') {
@@ -235,13 +255,14 @@ begin:
     } else if (c == 's') {
       mz_solve(maze, NULL);
     }
-    if (mz_get_tile(maze, pos) == MZ_WALL) {
-      pos.x = prev_pos.x;
-      pos.y = prev_pos.y;
+    if (mz_get_tile(maze, pos[0]) == MZ_WALL) {
+      pos[0].x = prev_pos.x;
+      pos[0].y = prev_pos.y;
     } else {
-      maze->start_pos = pos;
+      pos[2] = pos[1];
+      pos[1] = prev_pos;
     }
-    if (pos.x == end_point.x && pos.y == end_point.y) {
+    if (pos[0].x == end_point.x && pos[0].y == end_point.y) {
       RUNNING = 0;
     }
   }
