@@ -261,6 +261,8 @@ begin:
     } else {
       pos[2] = pos[1];
       pos[1] = prev_pos;
+      /* So when we press 's', we solve from the current pos. */
+      maze->start_pos = pos[0];
     }
     if (pos[0].x == end_point.x && pos[0].y == end_point.y) {
       RUNNING = 0;
